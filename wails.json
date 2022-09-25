@@ -1,0 +1,12 @@
+{
+  "name": "renfield",
+  "outputfilename": "renfield",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Jacek",
+    "email": "jacek.sawoszczuk@gmail.com"
+  }
+}

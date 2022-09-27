@@ -8,7 +8,7 @@ const data = reactive({
   indent: 2,
 })
 
-function greet() {
+function runFormatter() {
   PrettifyJSON(data.indent, data.input).then(result => {
     data.output = result
   })
@@ -18,7 +18,7 @@ function greet() {
 
 <template>
   <main>
-    <div>JSON prettyfier</div>
+    <div>JSON formatter</div>
 
     <div class="input-wrapper">
       <textarea id="input" class="text-box" v-model="data.input"
@@ -29,11 +29,8 @@ function greet() {
     </div>
 
     <div class="controls">
-      <label for="indent">
-        Indentation
-        <input id="indent" class="indent" v-model="data.indent" type="number" />
-      </label>
-      <button class="btn" @click="greet">Prettify</button>
+      <label>Indentation<va-counter class="mx-4 my-2" v-model="data.indent" /></label>
+      <va-button :rounded="false" class="" @click="runFormatter" size="large">Prettify</va-button>
     </div>
   </main>
 </template>
@@ -74,15 +71,5 @@ main {
 
 .text-box:hover {
   background-color: rgba(255, 255, 255, 1);
-}
-
-.controls button {
-  margin-left: 1.5rem;
-  padding: .2rem 3rem;
-}
-
-.controls .indent {
-  width: 3rem;
-  margin-left: .5rem;
 }
 </style>

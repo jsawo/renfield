@@ -1,20 +1,51 @@
 <script lang="ts" setup>
-import JsonBeautifier from './components/JsonBeautifier.vue'</script>
+import { computed } from '@vue/reactivity';
+import { reactive } from 'vue'
+import JsonFormatter from './components/JsonFormatter.vue'
+import Beam from './components/Beam.vue'
+
+const tabs = [
+  { icon: 'lightbulb', title: 'Beam', content: Beam },
+  { icon: 'auto_awesome', title: 'JSON Formatter', content: JsonFormatter },
+]
+
+const data = reactive({
+  tabs: tabs,
+  value: tabs[0].title,
+})
+
+const currentTab = computed(() => tabs.find(({ title }) => title === data.value) || tabs[0])
+</script>
 
 <template>
-  <JsonBeautifier/>
+  <div class="main_stack">
+    <va-tabs class="tabs" v-model="data.value">
+      <template #tabs>
+        <va-tab v-for="tab in data.tabs" :key="tab.title" :name="tab.title" class="px-2 py-2">
+          <va-icon :name="tab.icon" size="small" class="mr-2" />
+          {{tab.title}}
+        </va-tab>
+      </template>
+    </va-tabs>
+
+    <component class="component" :is="currentTab.content" />
+  </div>
 </template>
 
-<style>
-#logo {
-  display: block;
-  width: 50%;
-  height: 50%;
-  margin: auto;
-  padding: 10% 0 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-origin: content-box;
+<style scoped>
+.main_stack {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tabs {
+  flex-grow: 0;
+  font-size: 1.5rem;
+  padding-left: 1rem;
+}
+
+.component {
+  flex-grow: 1;
 }
 </style>

@@ -1,17 +1,26 @@
 <script lang="ts" setup>
 import { computed } from '@vue/reactivity';
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { EventsOn } from '../wailsjs/runtime'
 import JsonFormatter from './components/JsonFormatter.vue'
 import Beam from './components/Beam.vue'
 
 const tabs = [
-  { icon: 'lightbulb', title: 'Beam', content: Beam },
-  { icon: 'auto_awesome', title: 'JSON Formatter', content: JsonFormatter },
+  { id: "beam", icon: 'lightbulb', title: 'Beam', content: Beam },
+  { id: "jsonformatter", icon: 'auto_awesome', title: 'JSON Formatter', content: JsonFormatter },
 ]
 
 const data = reactive({
   tabs: tabs,
   value: tabs[0].title,
+})
+
+const messages = ref([])
+
+EventsOn("beamMessage", function (messageData: BeamMessage) {
+  console.log("GOT AN EVENT", messageData)
+  // @ts-ignore
+  messages.value.unshift(messageData)
 })
 
 const currentTab = computed(() => tabs.find(({ title }) => title === data.value) || tabs[0])
@@ -21,14 +30,15 @@ const currentTab = computed(() => tabs.find(({ title }) => title === data.value)
   <div class="main_stack">
     <va-tabs class="tabs" v-model="data.value">
       <template #tabs>
-        <va-tab v-for="tab in data.tabs" :key="tab.title" :name="tab.title" class="px-2 py-2">
+        <va-tab v-for="tab in data.tabs" :key="tab.id" :name="tab.title" class="px-2 py-2">
           <va-icon :name="tab.icon" size="small" class="mr-2" />
           {{tab.title}}
         </va-tab>
       </template>
     </va-tabs>
 
-    <component class="component" :is="currentTab.content" />
+    <Beam v-if="currentTab.id === 'beam'" :messages="messages" class="component" />
+    <component v-else class="component" :is="currentTab.content" />
   </div>
 </template>
 

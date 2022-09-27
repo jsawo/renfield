@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/jsawo/renfield/beam"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -23,6 +24,7 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	beam.StartServer(ctx)
 }
 
 // PrettifyJSON return a prettified json string with a given indentation

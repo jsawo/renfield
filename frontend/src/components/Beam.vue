@@ -1,71 +1,36 @@
 <script lang="ts" setup>
 import { reactive } from 'vue'
-import { PrettifyJSON } from '../../wailsjs/go/main/App'
 
-const data = reactive({
-  input: "",
-  output: "",
-  indent: 2,
-})
-
-function greet() {
-  PrettifyJSON(data.indent, data.input).then(result => {
-    data.output = result
-  })
-}
-
+defineProps<{
+  messages: Array<BeamMessage>,
+}>()
 </script>
 
 <template>
   <main>
-    <div>Beam</div>
-
-    <div class="input-wrapper">
-      <textarea id="input" class="text-box" v-model="data.input"
-                placeholder="Paste JSON here">
-      </textarea>
-
-      <textarea id="output" class="text-box" v-model="data.output"></textarea>
-    </div>
-
+    <div>Beam (:3333)</div>
+    <ul class="log_box">
+      <li v-for="msg in messages">
+        <va-card square outlined>
+          <va-card-title>Date here</va-card-title>
+          <va-card-content>
+            <pre class="payload">{{ JSON.stringify(JSON.parse(msg.Payload), null, 2) }}</pre>
+          </va-card-content>
+        </va-card>
+      </li>
+    </ul>
   </main>
 </template>
 
 <style scoped>
 main {
-  box-sizing: border-box;
   display: flex;
-  gap: 1rem;
+  height: auto;
+  overflow: scroll;
   flex-direction: column;
-  height: 100%;
-  padding: 1.5rem;
 }
 
-.input-wrapper {
-  display: flex;
-  flex-grow: 1;
-  gap: 1rem;
-}
-
-.text-box {
-  box-sizing: border-box;
-  border-radius: 3px;
-  outline: none;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  padding: 0 10px;
-  background-color: rgba(240, 240, 240, 1);
-  -webkit-font-smoothing: antialiased;
-  height: 100%;
-  flex-grow: 1;
-  padding: 0.5rem;
-  font-family: 'Courier New', Courier, monospace;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow-x: scroll;
-}
-
-.text-box:hover {
-  background-color: rgba(255, 255, 255, 1);
+.payload {
+  text-align: left;
 }
 </style>

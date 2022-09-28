@@ -4,10 +4,12 @@ import { reactive, ref } from 'vue'
 import { EventsOn } from '../wailsjs/runtime'
 import JsonFormatter from './components/JsonFormatter.vue'
 import Beam from './components/Beam.vue'
+import Tinker from './components/Tinker.vue'
 
 const tabs = [
-  { id: "beam", icon: 'lightbulb', title: 'Beam', content: Beam },
   { id: "jsonformatter", icon: 'auto_awesome', title: 'JSON Formatter', content: JsonFormatter },
+  { id: "beam", icon: 'lightbulb', title: 'Beam', content: Beam },
+  { id: "tinker", icon: 'handyman', title: 'Tinker', content: Tinker },
 ]
 
 const data = reactive({

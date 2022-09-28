@@ -1,12 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"github.com/jsawo/renfield/beam"
+	"github.com/jsawo/renfield/json"
+	"github.com/jsawo/renfield/tinker"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -27,20 +26,15 @@ func (a *App) startup(ctx context.Context) {
 	beam.StartServer(ctx)
 }
 
-// PrettifyJSON return a prettified json string with a given indentation
+func (a *App) OpenDirectoryDialog() string {
+	result, _ := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+	return result
+}
+
 func (a *App) PrettifyJSON(indent int, input string) string {
-	if input == "" {
-		return ""
-	}
+	return json.PrettifyJSON(a.ctx, indent, input)
+}
 
-	indentstring := fmt.Sprintf("%*s", indent, "")
-
-	var result bytes.Buffer
-	err := json.Indent(&result, []byte(input), "", indentstring)
-	if err != nil {
-		runtime.LogError(a.ctx, err.Error())
-		return err.Error()
-	}
-
-	return result.String()
+func (a *App) ExecuteTinkerCommand(projectDir, input string) string {
+	return tinker.ExecuteCommand(a.ctx, projectDir, input)
 }

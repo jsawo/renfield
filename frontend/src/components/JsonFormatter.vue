@@ -30,7 +30,7 @@ function runFormatter() {
 
     <div class="controls">
       <label>Indentation<va-counter class="mx-4 my-2" v-model="data.indent" /></label>
-      <va-button :rounded="false" class="" @click="runFormatter" size="large">Prettify</va-button>
+      <va-button :rounded="false" class="" @click="runFormatter" size="large">Format</va-button>
     </div>
   </main>
 </template>

@@ -35,6 +35,22 @@ func (a *App) PrettifyJSON(indent int, input string) string {
 	return json.PrettifyJSON(a.ctx, indent, input)
 }
 
-func (a *App) ExecuteTinkerCommand(projectDir, input string) string {
-	return tinker.ExecuteCommand(a.ctx, projectDir, input)
+func (a *App) GetLastJSON() string {
+	return json.GetLastCode(a.ctx)
+}
+
+func (a *App) ExecuteTinkerCommand(input string) string {
+	return tinker.ExecuteCommand(a.ctx, input)
+}
+
+func (a *App) SetProjectDir(projectDir string) {
+	tinker.SetProjectDir(a.ctx, projectDir)
+}
+
+func (a *App) GetProjectDir() string {
+	return tinker.GetProjectDir(a.ctx)
+}
+
+func (a *App) GetLastCode() string {
+	return tinker.GetLastCode(a.ctx)
 }

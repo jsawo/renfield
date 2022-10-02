@@ -7,9 +7,9 @@ import Beam from './components/Beam.vue'
 import Tinker from './components/Tinker.vue'
 
 const tabs = [
+  { id: "tinker", icon: 'handyman', title: 'Tinker', content: Tinker },
   { id: "jsonformatter", icon: 'auto_awesome', title: 'JSON Formatter', content: JsonFormatter },
   { id: "beam", icon: 'lightbulb', title: 'Beam', content: Beam },
-  { id: "tinker", icon: 'handyman', title: 'Tinker', content: Tinker },
 ]
 
 const data = reactive({
@@ -20,7 +20,6 @@ const data = reactive({
 const messages = ref([])
 
 EventsOn("beamMessage", function (messageData: BeamMessage) {
-  console.log("GOT AN EVENT", messageData)
   // @ts-ignore
   messages.value.unshift(messageData)
 })

@@ -1,17 +1,21 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
-import { ExecuteTinkerCommand, OpenDirectoryDialog } from '../../wailsjs/go/main/App'
+import { reactive, ref, onMounted } from 'vue'
+import {
+  ExecuteTinkerCommand,
+  OpenDirectoryDialog,
+  SetProjectDir,
+  GetProjectDir,
+  GetLastCode
+} from '../../wailsjs/go/main/App'
 
 const data = reactive({
   projectDir: "",
-  input: "User::factory()->make()",
+  input: "",
   output: "",
 })
 
-// const flag
-
 function runTinker() {
-  ExecuteTinkerCommand(data.projectDir, data.input).then(result => {
+  ExecuteTinkerCommand(data.input).then(result => {
     data.output = result
   })
 }
@@ -19,6 +23,7 @@ function runTinker() {
 function openDirectoryDialog(): void {
   OpenDirectoryDialog().then((value: string) => {
     data.projectDir = value
+    SetProjectDir(value)
   })
 }
 
@@ -26,8 +31,18 @@ function handleKeyboardShortcuts(e: KeyboardEvent): void {
   if (e.ctrlKey && (e.code === 'Enter' || e.code === 'KeyR')) {
     runTinker()
   }
+  if (e.ctrlKey && e.code === 'KeyZ') {
+    document.execCommand("undo")
+  }
+  if (e.ctrlKey && e.shiftKey && e.code === 'KeyZ') {
+    document.execCommand("redo")
+  }
 }
 
+onMounted(() => {
+  GetProjectDir().then((dir) => data.projectDir = dir)
+  GetLastCode().then((code) => data.input = code)
+})
 </script>
 
 <template>

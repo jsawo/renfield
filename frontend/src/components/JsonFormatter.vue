@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { reactive } from 'vue'
-import { PrettifyJSON } from '../../wailsjs/go/main/App'
+import { reactive, onMounted } from 'vue'
+import { PrettifyJSON, GetLastJSON } from '../../wailsjs/go/main/App'
 
 const data = reactive({
   input: "",
@@ -14,10 +14,25 @@ function runFormatter() {
   })
 }
 
+function handleKeyboardShortcuts(e: KeyboardEvent): void {
+  if (e.ctrlKey && (e.code === 'Enter' || e.code === 'KeyR')) {
+    runFormatter()
+  }
+  if (e.ctrlKey && e.code === 'KeyZ') {
+    document.execCommand("undo")
+  }
+  if (e.ctrlKey && e.shiftKey && e.code === 'KeyZ') {
+    document.execCommand("redo")
+  }
+}
+
+onMounted(() => {
+  GetLastJSON().then((code) => data.input = code)
+})
 </script>
 
 <template>
-  <main>
+  <main @keypress="handleKeyboardShortcuts">
     <div>JSON formatter</div>
 
     <div class="input-wrapper">

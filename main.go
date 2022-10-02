@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 
+	"github.com/jsawo/renfield/config"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 )
@@ -11,6 +12,8 @@ import (
 var assets embed.FS
 
 func main() {
+	config.Load()
+
 	// Create an instance of the app structure
 	app := NewApp()
 

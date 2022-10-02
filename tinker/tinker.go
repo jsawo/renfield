@@ -47,7 +47,7 @@ func ExecuteCommand(ctx context.Context, input string) string {
 		os.Exit(1)
 	}
 
-	commandString := fmt.Sprintf("php artisan tinker < %q", tempFile)
+	commandString := fmt.Sprintf("cat %q | sed -e 's/^<?php//' | php artisan tinker", tempFile)
 	cmd := exec.Command("sh", "-c", commandString)
 	cmd.Dir = projectDir
 

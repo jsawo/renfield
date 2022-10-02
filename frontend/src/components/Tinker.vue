@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref, onMounted } from 'vue'
+import Editor from '@guolao/vue-monaco-editor'
 import {
   ExecuteTinkerCommand,
   OpenDirectoryDialog,
@@ -31,12 +32,6 @@ function handleKeyboardShortcuts(e: KeyboardEvent): void {
   if (e.ctrlKey && (e.code === 'Enter' || e.code === 'KeyR')) {
     runTinker()
   }
-  if (e.ctrlKey && e.code === 'KeyZ') {
-    document.execCommand("undo")
-  }
-  if (e.ctrlKey && e.shiftKey && e.code === 'KeyZ') {
-    document.execCommand("redo")
-  }
 }
 
 onMounted(() => {
@@ -47,12 +42,24 @@ onMounted(() => {
 
 <template>
   <main @keypress="handleKeyboardShortcuts">
-    <div>Tinker {{ data.projectDir }}</div>
+    <div>Tinker ({{ data.projectDir }})</div>
 
     <div class="input-wrapper">
-      <textarea id="input" class="text-box" v-model="data.input" placeholder="Code here, eg: User::factory()->make()"></textarea>
+    <Editor
+      id="input" class="text-box"
+      :value="data.input"
+      theme='vs-dark'
+      defaultLanguage="php"
+      @Change="(val, event) => data.input = val"
+    />
 
-      <textarea id="output" class="text-box" v-model="data.output"></textarea>
+    <Editor
+      id="output" class="text-box"
+      :value="data.output"
+      theme='vs-dark'
+      defaultLanguage="php"
+    />
+
     </div>
 
     <div class="controls">
@@ -78,27 +85,10 @@ main {
   display: flex;
   flex-grow: 1;
   gap: 1rem;
+  text-align: left;
 }
 
 .text-box {
-  box-sizing: border-box;
-  border-radius: 3px;
-  outline: none;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  padding: 0 10px;
-  background-color: rgba(240, 240, 240, 1);
-  -webkit-font-smoothing: antialiased;
-  height: 100%;
-  flex-grow: 1;
-  padding: 0.5rem;
-  font-family: 'Courier New', Courier, monospace;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow-x: scroll;
-}
-
-.text-box:hover {
-  background-color: rgba(255, 255, 255, 1);
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 </style>

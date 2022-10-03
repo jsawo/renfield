@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { reactive, onMounted } from 'vue'
 import Editor from '@guolao/vue-monaco-editor'
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
 import { PrettifyJSON, GetLastJSON } from '../../wailsjs/go/main/App'
 
 const data = reactive({
@@ -33,24 +35,29 @@ onMounted(() => {
 </script>
 
 <template>
-  <main @keypress="handleKeyboardShortcuts">
+  <main class="contentwrapper" @keypress="handleKeyboardShortcuts">
     <div>JSON formatter</div>
 
     <div class="input-wrapper">
-      <Editor
-        id="input" class="code-editor text-box"
-        :value="data.input"
-        theme='vs-dark'
-        defaultLanguage="json"
-        @Change="(val, event) => data.input = val"
-      />
-
-      <Editor
-        id="input" class="code-editor text-box"
-        :value="data.output"
-        theme='vs-dark'
-        defaultLanguage="json"
-      />
+      <splitpanes class="default-theme">
+        <pane>
+          <Editor
+            id="input" class="code-editor text-box"
+            :value="data.input"
+            theme='vs-dark'
+            defaultLanguage="json"
+            @Change="(val, event) => data.input = val"
+          />
+        </pane>
+        <pane>
+          <Editor
+            id="input" class="code-editor text-box"
+            :value="data.output"
+            theme='vs-dark'
+            defaultLanguage="json"
+          />
+        </pane>
+      </splitpanes>
     </div>
 
     <div class="controls">
@@ -61,21 +68,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
-main {
+.contentwrapper {
   box-sizing: border-box;
   display: flex;
   gap: 1rem;
   flex-direction: column;
-  height: 100%;
+  height: 99%;
   padding: 1.5rem .5rem;
 }
-
 .input-wrapper {
-  display: flex;
   flex-grow: 1;
-  gap: .5rem;
+  height: 50%;
 }
-
 .controls {
   text-align: center;
 }

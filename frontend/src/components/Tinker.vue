@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, onMounted } from 'vue'
 import Editor from '@guolao/vue-monaco-editor'
 import {
   ExecuteTinkerCommand,
@@ -46,7 +46,7 @@ onMounted(() => {
 
     <div class="input-wrapper">
     <Editor
-      id="input" class="text-box"
+      id="input" class="code-editor text-box"
       :value="data.input"
       theme='vs-dark'
       defaultLanguage="php"
@@ -54,7 +54,7 @@ onMounted(() => {
     />
 
     <Editor
-      id="output" class="text-box"
+      id="output" class="code-editor text-box"
       :value="data.output"
       theme='vs-dark'
       defaultLanguage="php"
@@ -78,17 +78,16 @@ main {
   gap: 1rem;
   flex-direction: column;
   height: 100%;
-  padding: 1.5rem;
+  padding: 1.5rem .5rem;
 }
 
 .input-wrapper {
   display: flex;
   flex-grow: 1;
-  gap: 1rem;
-  text-align: left;
+  gap: .5rem;
 }
 
-.text-box {
-  font-family: Georgia, 'Times New Roman', Times, serif;
+.controls {
+  text-align: center;
 }
 </style>

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { reactive, onMounted } from 'vue'
+import Editor from '@guolao/vue-monaco-editor'
 import { PrettifyJSON, GetLastJSON } from '../../wailsjs/go/main/App'
 
 const data = reactive({
@@ -36,11 +37,20 @@ onMounted(() => {
     <div>JSON formatter</div>
 
     <div class="input-wrapper">
-      <textarea id="input" class="text-box" v-model="data.input"
-                placeholder="Paste JSON here">
-      </textarea>
+      <Editor
+        id="input" class="code-editor text-box"
+        :value="data.input"
+        theme='vs-dark'
+        defaultLanguage="json"
+        @Change="(val, event) => data.input = val"
+      />
 
-      <textarea id="output" class="text-box" v-model="data.output"></textarea>
+      <Editor
+        id="input" class="code-editor text-box"
+        :value="data.output"
+        theme='vs-dark'
+        defaultLanguage="json"
+      />
     </div>
 
     <div class="controls">
@@ -57,34 +67,16 @@ main {
   gap: 1rem;
   flex-direction: column;
   height: 100%;
-  padding: 1.5rem;
+  padding: 1.5rem .5rem;
 }
 
 .input-wrapper {
   display: flex;
   flex-grow: 1;
-  gap: 1rem;
+  gap: .5rem;
 }
 
-.text-box {
-  box-sizing: border-box;
-  border-radius: 3px;
-  outline: none;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  padding: 0 10px;
-  background-color: rgba(240, 240, 240, 1);
-  -webkit-font-smoothing: antialiased;
-  height: 100%;
-  flex-grow: 1;
-  padding: 0.5rem;
-  font-family: 'Courier New', Courier, monospace;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow-x: scroll;
-}
-
-.text-box:hover {
-  background-color: rgba(255, 255, 255, 1);
+.controls {
+  text-align: center;
 }
 </style>

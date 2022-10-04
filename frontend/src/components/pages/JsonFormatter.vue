@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { reactive, onMounted } from 'vue'
-import Editor from '@guolao/vue-monaco-editor'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-import { PrettifyJSON, GetLastJSON } from '../../wailsjs/go/main/App'
+import { PrettifyJSON, GetLastJSON } from '../../../wailsjs/go/main/App'
+import Editor from '../Editor.vue'
 
 const data = reactive({
   input: "",
@@ -18,14 +18,8 @@ function runFormatter() {
 }
 
 function handleKeyboardShortcuts(e: KeyboardEvent): void {
-  if (e.ctrlKey && (e.code === 'Enter' || e.code === 'KeyR')) {
+  if (e.ctrlKey && e.code === 'KeyR') {
     runFormatter()
-  }
-  if (e.ctrlKey && e.code === 'KeyZ') {
-    document.execCommand("undo")
-  }
-  if (e.ctrlKey && e.shiftKey && e.code === 'KeyZ') {
-    document.execCommand("redo")
   }
 }
 
@@ -41,28 +35,27 @@ onMounted(() => {
     <div class="input-wrapper">
       <splitpanes class="default-theme">
         <pane>
-          <Editor
-            id="input" class="code-editor text-box"
+          <Editor class="code-editor text-box"
             :value="data.input"
-            theme='vs-dark'
-            defaultLanguage="json"
+            language="json"
             @Change="(val, event) => data.input = val"
           />
         </pane>
         <pane>
-          <Editor
-            id="input" class="code-editor text-box"
+          <Editor class="code-editor text-box"
             :value="data.output"
-            theme='vs-dark'
-            defaultLanguage="json"
+            language="json"
           />
         </pane>
       </splitpanes>
     </div>
 
     <div class="controls">
-      <label>Indentation<va-counter class="mx-4 my-2" v-model="data.indent" /></label>
-      <va-button :rounded="false" class="" @click="runFormatter" size="large">Format</va-button>
+      <div class="input_indentation">
+        <w-input type="number" v-model="data.indent" outline min="0" max="8">Indentation</w-input>
+      </div>
+
+      <w-button xl class="ma1" bg-color="primary" color="white" @click="runFormatter">Format</w-button>
     </div>
   </main>
 </template>
@@ -74,7 +67,7 @@ onMounted(() => {
   gap: 1rem;
   flex-direction: column;
   height: 99%;
-  padding: 1.5rem .5rem;
+  padding-bottom: 1.5rem;
 }
 .input-wrapper {
   flex-grow: 1;
@@ -82,5 +75,10 @@ onMounted(() => {
 }
 .controls {
   text-align: center;
+}
+
+.input_indentation {
+  width: 6em;
+  display: inline-block;
 }
 </style>

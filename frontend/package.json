@@ -12,7 +12,7 @@
     "@guolao/vue-monaco-editor": "^0.0.5",
     "splitpanes": "^3.1.1",
     "vue": "^3.2.37",
-    "vuestic-ui": "^1.4.13"
+    "wave-ui": "^2.42.2"
   },
   "devDependencies": {
     "@babel/types": "^7.18.10",

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { reactive, onMounted } from 'vue'
-import Editor from '@guolao/vue-monaco-editor'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import {
@@ -9,7 +8,10 @@ import {
   SetProjectDir,
   GetProjectDir,
   GetLastCode
-} from '../../wailsjs/go/main/App'
+} from '../../../wailsjs/go/main/App'
+import Editor from '../Editor.vue'
+import { registerPHPSnippetLanguage } from '../../registerPHPSnippetLanguage'
+
 
 const data = reactive({
   projectDir: "",
@@ -31,7 +33,7 @@ function openDirectoryDialog(): void {
 }
 
 function handleKeyboardShortcuts(e: KeyboardEvent): void {
-  if (e.ctrlKey && (e.code === 'Enter' || e.code === 'KeyR')) {
+  if (e.ctrlKey && e.code === 'KeyR') {
     runTinker()
   }
 }
@@ -40,6 +42,10 @@ onMounted(() => {
   GetProjectDir().then((dir) => data.projectDir = dir)
   GetLastCode().then((code) => data.input = code)
 })
+
+const handleMonacoBeforeMount = function (monaco) {
+  registerPHPSnippetLanguage(monaco.languages)
+}
 </script>
 
 <template>
@@ -49,30 +55,27 @@ onMounted(() => {
     <div class="input-wrapper">
       <splitpanes class="default-theme">
         <pane>
-          <Editor
-            id="input" class="code-editor text-box"
+          <Editor class="code-editor text-box"
             :value="data.input"
-            theme='vs-dark'
-            defaultLanguage="php"
+            language="php-snippet"
             @Change="(val, event) => data.input = val"
+            :onBeforeMount="handleMonacoBeforeMount"
           />
         </pane>
         <pane>
-          <Editor
-            id="output" class="code-editor text-box"
+          <Editor class="code-editor text-box"
             :value="data.output"
-            theme='vs-dark'
-            defaultLanguage="php"
+            language="php"
           />
         </pane>
       </splitpanes>
     </div>
 
     <div class="controls">
-      <label>Project dir
-        <va-button outline :rounded="false" class="mr-4" @click="openDirectoryDialog" size="small">Select</va-button>
+      <label>Project dir:
+        <w-button class="ma1" color="primary" @click="openDirectoryDialog" outline md>Select</w-button>
       </label>
-      <va-button :rounded="false" class="" @click="runTinker" size="large">Execute</va-button>
+      <w-button xl class="ma1" bg-color="primary" color="white" @click="runTinker">Execute</w-button>
     </div>
   </main>
 </template>
@@ -84,7 +87,7 @@ onMounted(() => {
   gap: 1rem;
   flex-direction: column;
   height: 99%;
-  padding: 1.5rem .5rem;
+  padding-bottom: 1.5rem;
 }
 
 .input-wrapper {

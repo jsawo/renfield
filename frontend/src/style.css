@@ -16,6 +16,9 @@ body {
 
 #app {
     height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 div.code-editor * {

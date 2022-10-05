@@ -29,7 +29,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="contentwrapper" @keypress="handleKeyboardShortcuts">
+  <main class="content-wrapper" @keypress="handleKeyboardShortcuts">
     <div>JSON formatter</div>
 
     <div class="input-wrapper">
@@ -61,13 +61,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.contentwrapper {
+.content-wrapper {
   box-sizing: border-box;
   display: flex;
   gap: 1rem;
   flex-direction: column;
-  height: 99%;
-  padding-bottom: 1.5rem;
+  height: 100%;
 }
 .input-wrapper {
   flex-grow: 1;

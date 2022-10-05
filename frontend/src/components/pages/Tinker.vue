@@ -49,7 +49,7 @@ const handleMonacoBeforeMount = function (monaco) {
 </script>
 
 <template>
-  <main class="contentwrapper" @keypress="handleKeyboardShortcuts">
+  <main class="content-wrapper" @keypress="handleKeyboardShortcuts">
     <div>Tinker ({{ data.projectDir }})</div>
 
     <div class="input-wrapper">
@@ -81,13 +81,12 @@ const handleMonacoBeforeMount = function (monaco) {
 </template>
 
 <style scoped>
-.contentwrapper {
+.content-wrapper {
   box-sizing: border-box;
   display: flex;
   gap: 1rem;
   flex-direction: column;
-  height: 99%;
-  padding-bottom: 1.5rem;
+  height: 100%;
 }
 
 .input-wrapper {

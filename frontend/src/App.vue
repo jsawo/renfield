@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import 'wave-ui/dist/wave-ui.css'
 import { reactive, ref } from 'vue'
-import { EventsOn } from '../wailsjs/runtime'
-import JsonFormatter from './components/pages/JsonFormatter.vue'
-import Beam from './components/pages/Beam.vue'
-import Tinker from './components/pages/Tinker.vue'
+import { EventsOn } from '@wails/runtime'
+import JsonFormatter from '@/components/pages/JsonFormatter.vue'
+import Beam from '@/components/pages/Beam.vue'
+import Tinker from '@/components/pages/Tinker.vue'
 
 const tabs = [
   { id: "tinker", title: 'Tinker', content: Tinker },

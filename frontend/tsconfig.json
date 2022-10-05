@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
@@ -14,7 +15,15 @@
       "ESNext",
       "DOM"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": [
+        "src/*",
+      ],
+      "@wails/*": [
+        "wailsjs/*",
+      ],
+    }
   },
   "include": [
     "src/**/*.ts",

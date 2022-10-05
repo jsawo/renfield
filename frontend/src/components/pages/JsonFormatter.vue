@@ -2,8 +2,8 @@
 import { reactive, onMounted } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-import { PrettifyJSON, GetLastJSON } from '../../../wailsjs/go/main/App'
-import Editor from '../Editor.vue'
+import { PrettifyJSON, GetLastCode } from '@wails/go/json/JSONFormatter'
+import Editor from '@/components/Editor.vue'
 
 const data = reactive({
   input: "",
@@ -24,7 +24,7 @@ function handleKeyboardShortcuts(e: KeyboardEvent): void {
 }
 
 onMounted(() => {
-  GetLastJSON().then((code) => data.input = code)
+  GetLastCode().then((code) => data.input = code)
 })
 </script>
 

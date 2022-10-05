@@ -11,8 +11,16 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+type JSONFormatter struct {
+	Ctx context.Context
+}
+
+func NewJSONFormatter() *JSONFormatter {
+	return &JSONFormatter{}
+}
+
 // PrettifyJSON returns a prettified json string with a given indentation
-func PrettifyJSON(ctx context.Context, indent int, input string) string {
+func (j *JSONFormatter) PrettifyJSON(indent int, input string) string {
 	if input == "" {
 		return ""
 	}
@@ -29,14 +37,14 @@ func PrettifyJSON(ctx context.Context, indent int, input string) string {
 	var result bytes.Buffer
 	err = json.Indent(&result, []byte(input), "", indentstring)
 	if err != nil {
-		runtime.LogError(ctx, err.Error())
+		runtime.LogError(j.Ctx, err.Error())
 		return err.Error()
 	}
 
 	return result.String()
 }
 
-func GetLastCode(ctx context.Context) string {
+func (j *JSONFormatter) GetLastCode() string {
 	content, err := os.ReadFile(config.GetTempFilePath("json"))
 	if err != nil {
 		return "-no preset content found-"
@@ -44,3 +52,4 @@ func GetLastCode(ctx context.Context) string {
 
 	return string(content)
 }
+	

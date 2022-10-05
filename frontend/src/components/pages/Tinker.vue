@@ -2,15 +2,15 @@
 import { reactive, onMounted } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
+import { OpenDirectoryDialog } from '@wails/go/main/App'
 import {
-  ExecuteTinkerCommand,
-  OpenDirectoryDialog,
+  ExecuteCommand,
   SetProjectDir,
   GetProjectDir,
   GetLastCode
-} from '../../../wailsjs/go/main/App'
-import Editor from '../Editor.vue'
-import { registerPHPSnippetLanguage } from '../../registerPHPSnippetLanguage'
+} from '@wails/go/tinker/Tinker'
+import Editor from '@/components/Editor.vue'
+import { registerPHPSnippetLanguage } from '@/registerPHPSnippetLanguage'
 
 
 const data = reactive({
@@ -20,7 +20,7 @@ const data = reactive({
 })
 
 function runTinker() {
-  ExecuteTinkerCommand(data.input).then(result => {
+  ExecuteCommand(data.input).then(result => {
     data.output = result
   })
 }

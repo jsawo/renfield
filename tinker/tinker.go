@@ -9,17 +9,25 @@ import (
 	"github.com/jsawo/renfield/config"
 )
 
+type Tinker struct {
+	Ctx context.Context
+}
+
+func NewTinker() *Tinker {
+	return &Tinker{}
+}
+
 // SetProjectDir saves a given project path
-func SetProjectDir(ctx context.Context, projectDir string) {
+func (t *Tinker) SetProjectDir(projectDir string) {
 	config.Set("laravel.project", projectDir)
 	config.Save()
 }
 
-func GetProjectDir(ctx context.Context) string {
+func (t *Tinker) GetProjectDir() string {
 	return config.GetString("laravel.project")
 }
 
-func GetLastCode(ctx context.Context) string {
+func (t *Tinker) GetLastCode() string {
 	content, err := os.ReadFile(config.GetTempFilePath("tinker"))
 	if err != nil {
 		return "-no preset content found-"
@@ -29,7 +37,7 @@ func GetLastCode(ctx context.Context) string {
 }
 
 // ExecuteCommand executes a tinker command and returns the result
-func ExecuteCommand(ctx context.Context, input string) string {
+func (t *Tinker) ExecuteCommand(input string) string {
 	if input == "" {
 		return ""
 	}

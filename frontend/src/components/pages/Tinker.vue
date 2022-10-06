@@ -27,6 +27,7 @@ function runTinker() {
 
 function openDirectoryDialog(): void {
   OpenDirectoryDialog().then((value: string) => {
+    if (value.trim() == '') return
     data.projectDir = value
     SetProjectDir(value)
   })

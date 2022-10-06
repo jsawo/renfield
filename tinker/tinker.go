@@ -30,7 +30,7 @@ func (t *Tinker) GetProjectDir() string {
 func (t *Tinker) GetLastCode() string {
 	content, err := os.ReadFile(config.GetTempFilePath("tinker"))
 	if err != nil {
-		return "-no preset content found-"
+		return "User::factory()->make()"
 	}
 
 	return string(content)

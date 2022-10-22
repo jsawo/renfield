@@ -21,9 +21,7 @@ defineProps<{
       },
       scrollBeyondLastLine: false,
       renderWhitespace: 'none',
+      fontSize: 16,
     }"
   />
 </template>
-
-<style scoped>
-</style>

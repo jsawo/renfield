@@ -22,8 +22,7 @@ body {
 }
 
 div.code-editor * {
-    font-family: 'DejaVu Sans Code', 'JetBrains Mono', 'Noto Sans Mono', 'Roboto Mono', 'Ubuntu Mono', 'Source Code Pro', monospace;
-    font-size: 1rem;
+    font-family: 'DejaVu Sans Code', 'JetBrains Mono', 'Noto Sans Mono', 'Roboto Mono', 'Source Code Pro', monospace;
 }
 
 .w-app .w-tabs,

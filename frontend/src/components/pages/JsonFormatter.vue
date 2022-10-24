@@ -44,6 +44,7 @@ onMounted(() => {
         <pane>
           <Editor class="code-editor text-box"
             :value="data.output"
+            :format-on-paste="false"
             language="json"
           />
         </pane>
@@ -81,3 +82,8 @@ onMounted(() => {
   display: inline-block;
 }
 </style>
+
+
+Http::post("http://localhost:3333/beam", ["payload"=> json_encode($u)]);
+
+curl -X POST -d '{"payload": "that"}' http://localhost:3333/beam

@@ -25,6 +25,16 @@ div.code-editor * {
     font-family: 'DejaVu Sans Code', 'JetBrains Mono', 'Noto Sans Mono', 'Roboto Mono', 'Source Code Pro', monospace;
 }
 
+.input-wrapper .splitpanes .splitpanes__splitter {
+    width: 6px;
+    background: linear-gradient(90deg, #333, #555, #333);
+    border: none;
+}
+
+.input-wrapper .splitpanes .splitpanes__splitter:hover {
+    background: linear-gradient(90deg, #666, #aaa, #666);
+}
+
 .w-app .w-tabs,
 .w-app .w-tabs__content-wrap,
 .w-app .w-tabs__content {

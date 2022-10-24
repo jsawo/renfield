@@ -24,6 +24,10 @@ EventsOn("beamMessage", function (messageData: BeamMessage) {
   // @ts-ignore
   messages.value.unshift(messageData)
 })
+
+function clearMessages() {
+  messages.value = [];
+}
 </script>
 
 <template>
@@ -38,7 +42,7 @@ EventsOn("beamMessage", function (messageData: BeamMessage) {
       <w-tabs :items="tabs" transition="none" style="flex-grow: 1;" card>
         <template #item-content="{ item }">
           <div class="component-wrapper">
-            <Beam v-if="item.id === 'beam'" :messages="messages" class="component" />
+            <Beam v-if="item.id === 'beam'" :messages="messages" class="component" @clear-beam-messages="clearMessages"/>
             <component v-else class="component" :is="item.content" />
           </div>
         </template>

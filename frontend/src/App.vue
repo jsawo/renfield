@@ -1,11 +1,20 @@
 <script lang="ts" setup>
 import 'wave-ui/dist/wave-ui.css'
+import dayjs from 'dayjs'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import { reactive, ref } from 'vue'
 import { EventsOn } from '@wails/runtime'
 import JsonFormatter from '@/components/pages/JsonFormatter.vue'
 import Beam from '@/components/pages/Beam.vue'
 import Tinker from '@/components/pages/Tinker.vue'
 import '@mdi/font/css/materialdesignicons.min.css'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+dayjs.locale('pl')
+dayjs.tz.setDefault("Europe/Warsaw")
 
 const tabs = [
   { id: "tinker", title: 'Tinker', content: Tinker },
@@ -18,11 +27,14 @@ const data = reactive({
   value: tabs[0].title,
 })
 
-const messages = ref([])
+const messages = ref([] as Array<BeamMessage>)
 
-EventsOn("beamMessage", function (messageData: BeamMessage) {
+EventsOn("beamMessage", function (messageData: RawBeamMessage) {
   // @ts-ignore
-  messages.value.unshift(messageData)
+  messages.value.unshift({
+    timestamp: dayjs().toDate().toLocaleTimeString(),
+    payload: messageData.Payload
+  })
 })
 
 function clearMessages() {

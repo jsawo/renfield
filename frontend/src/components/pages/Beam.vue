@@ -56,11 +56,18 @@ const showNotification = ref(false)
       </div>
     </div>
 
+    <w-card class="mt2" id="empty-state" v-if="messages.length === 0">
+      <div>No messages received yet…</div>
+      <w-icon class="large-icon" xl>mdi mdi-message-minus-outline</w-icon>
+    </w-card>
+
     <ul class="log_box">
       <li v-for="(msg, index) in messages" :key="index">
         <w-card class="mt2">
-          <div class="title5">Date here</div>
-          <pre class="payload">{{ getPayload(msg.Payload) }}</pre>
+          <div class="message">
+            <div class="message__time">{{ msg.timestamp }}</div>
+            <pre class="message__payload">{{ getPayload(msg.payload) }}</pre>
+          </div>
         </w-card>
       </li>
     </ul>
@@ -72,5 +79,34 @@ main {
   display: flex;
   height: auto;
   flex-direction: column;
+}
+
+#empty-state {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.large-icon {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 5rem;
+}
+
+.message {
+  display: flex;
+  flex-direction: row;
+}
+
+.message__time {
+  width: 5rem;
+  flex-shrink: 0;
+}
+
+.message__payload {
+  width: 100%;
+}
+
+.log_box li:first-child .w-card {
+  border: solid 1px #999;
 }
 </style>

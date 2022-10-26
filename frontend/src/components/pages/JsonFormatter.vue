@@ -37,6 +37,7 @@ onMounted(() => {
         <pane>
           <Editor class="code-editor text-box"
             :value="data.input"
+            :format-on-paste="false"
             language="json"
             @Change="(val, event) => data.input = val"
           />
@@ -44,7 +45,6 @@ onMounted(() => {
         <pane>
           <Editor class="code-editor text-box"
             :value="data.output"
-            :format-on-paste="false"
             language="json"
           />
         </pane>

@@ -1,3 +1,0 @@
-interface BeamMessage {
-  Payload: string
-}

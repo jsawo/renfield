@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tsc": "npx vue-tsc --noEmit"
   },
   "dependencies": {
     "@guolao/vue-monaco-editor": "^0.0.5",

@@ -3,6 +3,7 @@ module github.com/jsawo/renfield
 go 1.18
 
 require (
+	github.com/oklog/ulid/v2 v2.1.0
 	github.com/spf13/viper v1.13.0
 	github.com/wailsapp/wails/v2 v2.0.0
 	golang.design/x/clipboard v0.6.2

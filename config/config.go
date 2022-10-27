@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -19,12 +18,14 @@ func Initialize() {
 	dirPath := GetAppConfigDir()
 	err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
-		fmt.Printf("ERR: Error creating config directory: %v", err)
+		fmt.Fprint(os.Stderr, "ERROR: Error creating config directory:", err.Error())
 	}
+
+	setDefaults()
 
 	err = viper.WriteConfigAs(path.Join(dirPath, configFile))
 	if err != nil {
-		fmt.Printf("ERR: Failed write to config file: %v", err)
+		fmt.Fprint(os.Stderr, "ERROR: Failed write to config file:", err.Error())
 	}
 }
 
@@ -70,15 +71,14 @@ func Load() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(GetAppConfigDir())
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		var e *viper.ConfigFileNotFoundError
-		if errors.As(err, &e) {
-			fmt.Println("Config file missing, recreating")
-		} else {
-			fmt.Printf("ERR: Config file failed to load: %v", err)
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found, initialize
+			Initialize()
+			return
 		}
 
-		Initialize()
+		fmt.Fprint(os.Stderr, "ERROR:", err.Error())
+		os.Exit(2)
 	}
 }

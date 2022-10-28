@@ -7,10 +7,21 @@ import (
 
 func setDefaults() {
 	defaultProjectId := project.GetNewId()
-	viper.Set("projects."+defaultProjectId+".id", defaultProjectId)
-	viper.Set("projects."+defaultProjectId+".type", "local")
-	viper.Set("projects."+defaultProjectId+".name", "Unnamed")
-	viper.Set("projects."+defaultProjectId+".path", "")
-	viper.Set("projects."+defaultProjectId+".tag", "local")
-	viper.Set("projects."+defaultProjectId+".tinker.tabs", []string{})
+	project := "projects." + defaultProjectId
+
+	viper.Set("currentproject", defaultProjectId)
+	viper.Set(project+".id", defaultProjectId)
+	viper.Set(project+".type", "local")
+	viper.Set(project+".name", "Unnamed")
+	viper.Set(project+".path", "")
+	viper.Set(project+".tag", "local")
+	viper.Set(project+".tinker.tabs", []string{})
+
+	viper.Set("tags", []Tag{
+		{Label: "local", Color: "green"},
+		{Label: "testing", Color: "gray"},
+		{Label: "development", Color: "blue"},
+		{Label: "staging", Color: "orange"},
+		{Label: "production", Color: "red"},
+	})
 }

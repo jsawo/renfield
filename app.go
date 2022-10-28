@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"github.com/jsawo/renfield/config"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.design/x/clipboard"
 )
@@ -27,4 +28,8 @@ func (a *App) OpenDirectoryDialog() string {
 
 func (a *App) CopyToClipboard(data string) {
 	clipboard.Write(clipboard.FmtText, []byte(data))
+}
+
+func (a *App) GetConfig() config.AppConfig {
+	return config.GetConfig()
 }

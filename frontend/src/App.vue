@@ -3,11 +3,12 @@ import 'wave-ui/dist/wave-ui.css'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { EventsOn } from '@wails/runtime'
 import JsonFormatter from '@/components/pages/JsonFormatter.vue'
 import Beam from '@/components/pages/Beam.vue'
 import Tinker from '@/components/pages/Tinker.vue'
+import { GetConfig } from '@wails/go/main/App'
 import '@mdi/font/css/materialdesignicons.min.css'
 
 dayjs.extend(utc)
@@ -27,10 +28,11 @@ const data = reactive({
   value: tabs[0].title,
 })
 
+const appConfig = ref({} as AppConfig)
+
 const messages = ref([] as Array<BeamMessage>)
 
 EventsOn("beamMessage", function (messageData: RawBeamMessage) {
-  // @ts-ignore
   messages.value.unshift({
     timestamp: dayjs().toDate().toLocaleTimeString(),
     payload: messageData.Payload
@@ -40,13 +42,41 @@ EventsOn("beamMessage", function (messageData: RawBeamMessage) {
 function clearMessages() {
   messages.value = [];
 }
+
+const currentProject = computed<Project>(function () {
+  return appConfig.value.Projects
+    ? appConfig.value.Projects[appConfig.value.Currentproject]
+    : {}
+})
+
+const currentColor = computed<string>(function() {
+  return getTagColor(currentProject.value.Tag)
+})
+
+function getTagColor(tag: string): string {
+  const foundTag = appConfig.value.Tags?.find(function(tagConfig) {
+    if (tag === tagConfig.Label) {
+      return tagConfig.Color
+    }
+  })
+
+  return foundTag ? foundTag.Color : "black"
+}
+
+onMounted(() => {
+  GetConfig().then((config) => appConfig.value = config)
+})
 </script>
 
 <template>
   <w-app style="height: 100%;">
     <div class="main-stack">
       <w-toolbar shadow>
-        <div class="title2">Renfield</div>
+        <div class="app-title">Renfield <div class="triangle"></div></div>
+        <div class="project-name">
+          {{ currentProject.Name }}
+          <w-tag class="ml2 mr2" outline :color="currentColor">{{ currentProject.Tag }}</w-tag>
+        </div>
         <div class="spacer"></div>
         <w-icon class="mr1" xl>mdi mdi-cog</w-icon>
       </w-toolbar>
@@ -73,5 +103,42 @@ function clearMessages() {
 .component-wrapper {
   height: 100%;
   padding: 0 0 2em 0;
+}
+
+.app-title {
+  font-size: 1.3rem;
+  background: rgb(37, 37, 37);
+  color: #eb5f5a;
+  margin: -.5rem 0 -.5rem -.8rem;
+  padding: .6rem 1rem .6rem 1.5rem;
+  position: relative;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.app-title::after {
+  content: "";
+  position: absolute;
+  display: block;
+  right: -20px;
+  top: 0;
+  border-top: 50px solid rgb(37, 37, 37);
+  border-right: 20px solid transparent;
+}
+
+.project-name {
+  font-size: 1.3rem;
+  margin: -.5rem 1rem -.5rem 0rem;
+  padding: .6rem .5rem .6rem 2.5rem;
+  cursor: pointer;
+}
+
+.project-name:hover {
+  background: #eee;
 }
 </style>

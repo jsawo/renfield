@@ -5,8 +5,32 @@ import (
 	"os"
 	"path"
 
+	"github.com/jsawo/renfield/editor"
 	"github.com/spf13/viper"
 )
+
+type AppConfig struct {
+	Currentproject string `mapstructure:"currentproject"`
+	Projects       map[string]ProjectConfig
+	Tags           []Tag
+}
+
+type ProjectConfig struct {
+	Id     string
+	Name   string
+	Tag    string
+	Type   string
+	Tinker TinkerConfig
+}
+
+type TinkerConfig struct {
+	Tabs []editor.Tab
+}
+
+type Tag struct {
+	Label string
+	Color string
+}
 
 const (
 	appDir      = "renfield"
@@ -33,29 +57,15 @@ func Save() {
 	_ = viper.WriteConfig()
 }
 
-func Set(key string, value any) {
-	viper.Set(key, value)
+func GetConfig() AppConfig {
+	var conf AppConfig
 
-	Save()
-}
+	err := viper.Unmarshal(&conf)
+	if err != nil {
+		fmt.Fprint(os.Stderr, "ERROR: unable to decode into struct:", err.Error())
+	}
 
-func Get(key string) interface{} {
-	return viper.Get(key)
-}
-
-func GetString(key string) string {
-	val, _ := Get(key).(string)
-	return val
-}
-
-func GetInt(key string) int {
-	val, _ := Get(key).(int)
-	return val
-}
-
-func GetBool(key string) bool {
-	val, _ := Get(key).(bool)
-	return val
+	return conf
 }
 
 func GetAppConfigDir() string {

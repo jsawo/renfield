@@ -1,7 +1,11 @@
 package project
 
-import "github.com/oklog/ulid/v2"
+import (
+	"strings"
+
+	"github.com/oklog/ulid/v2"
+)
 
 func GetNewId() string {
-	return ulid.Make().String()
+	return strings.ToLower(ulid.Make().String())
 }

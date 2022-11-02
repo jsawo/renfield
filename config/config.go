@@ -1,17 +1,43 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
 
+	"github.com/jsawo/renfield/editor"
 	"github.com/spf13/viper"
 )
 
+type AppConfig struct {
+	Currentproject string `mapstructure:"currentproject"`
+	Projects       map[string]ProjectConfig
+	Tags           []Tag
+}
+
+type ProjectConfig struct {
+	Id     string
+	Name   string
+	Path   string
+	Tag    string
+	Type   string
+	Tinker TinkerConfig
+}
+
+type TinkerConfig struct {
+	Tabs []editor.Tab
+}
+
+type Tag struct {
+	Label string
+	Color string
+}
+
+var appConfig AppConfig
+
 const (
 	appDir      = "renfield"
-	configFile  = "config.json"
+	configFile  = "config"
 	tempFileExt = ".tmp"
 )
 
@@ -19,42 +45,40 @@ func Initialize() {
 	dirPath := GetAppConfigDir()
 	err := os.MkdirAll(dirPath, os.ModePerm)
 	if err != nil {
-		fmt.Printf("ERR: Error creating config directory: %v", err)
+		fmt.Fprint(os.Stderr, "ERROR: Error creating config directory:", err.Error())
 	}
 
-	err = viper.WriteConfigAs(path.Join(dirPath, configFile))
+	setDefaults()
+
+	err = viper.SafeWriteConfig()
 	if err != nil {
-		fmt.Printf("ERR: Failed write to config file: %v", err)
+		fmt.Fprint(os.Stderr, "ERROR: Failed write to config file: \n", err.Error())
 	}
 }
 
-func Save() {
-	_ = viper.WriteConfig()
+func Save(config AppConfig) {
+	appConfig = config
+	viper.Set("currentproject", appConfig.Currentproject)
+	viper.Set("projects", appConfig.Projects)
+	viper.Set("tags", appConfig.Tags)
+
+	err := viper.WriteConfig()
+	if err != nil {
+		fmt.Fprint(os.Stderr, "ERROR: Failed write to config file:", err.Error())
+	}
 }
 
-func Set(key string, value any) {
-	viper.Set(key, value)
-
-	Save()
+func GetConfig() AppConfig {
+	return appConfig
 }
 
-func Get(key string) interface{} {
-	return viper.Get(key)
-}
+func GetFreshConfig() AppConfig {
+	err := viper.Unmarshal(&appConfig)
+	if err != nil {
+		panic(fmt.Errorf("ERROR: unable to decode into struct: %w", err))
+	}
 
-func GetString(key string) string {
-	val, _ := Get(key).(string)
-	return val
-}
-
-func GetInt(key string) int {
-	val, _ := Get(key).(int)
-	return val
-}
-
-func GetBool(key string) bool {
-	val, _ := Get(key).(bool)
-	return val
+	return appConfig
 }
 
 func GetAppConfigDir() string {
@@ -67,18 +91,22 @@ func GetTempFilePath(tempName string) string {
 }
 
 func Load() {
-	viper.SetConfigName("config")
+	viper.SetConfigName(configFile)
+	viper.SetConfigType("json")
 	viper.AddConfigPath(GetAppConfigDir())
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		var e *viper.ConfigFileNotFoundError
-		if errors.As(err, &e) {
-			fmt.Println("Config file missing, recreating")
-		} else {
-			fmt.Printf("ERR: Config file failed to load: %v", err)
+	appConfig = AppConfig{}
+
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found, initialize
+			Initialize()
+			return
 		}
 
-		Initialize()
+		fmt.Fprint(os.Stderr, "ERROR:", err.Error())
+		os.Exit(2)
 	}
+
+	appConfig = GetFreshConfig()
 }

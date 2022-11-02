@@ -17,16 +17,6 @@ func NewTinker() *Tinker {
 	return &Tinker{}
 }
 
-// SetProjectDir saves a given project path
-func (t *Tinker) SetProjectDir(projectDir string) {
-	config.Set("laravel.project", projectDir)
-	config.Save()
-}
-
-func (t *Tinker) GetProjectDir() string {
-	return config.GetString("laravel.project")
-}
-
 func (t *Tinker) GetLastCode() string {
 	content, err := os.ReadFile(config.GetTempFilePath("tinker"))
 	if err != nil {
@@ -42,7 +32,8 @@ func (t *Tinker) ExecuteCommand(input string) string {
 		return ""
 	}
 
-	projectDir := config.GetString("laravel.project")
+	currentProject := config.GetConfig().Currentproject
+	projectDir := config.GetConfig().Projects[currentProject].Path
 
 	if projectDir == "" {
 		return "Error - no project directory selected"

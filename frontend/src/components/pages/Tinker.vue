@@ -2,12 +2,7 @@
 import { reactive, onMounted } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-import { OpenDirectoryDialog } from '@wails/go/main/App'
-import {
-  ExecuteCommand,
-  SetProjectDir,
-  GetProjectDir,
-  GetLastCode
+import { ExecuteCommand, GetLastCode
 } from '@wails/go/tinker/Tinker'
 import Editor from '@/components/Editor.vue'
 import { registerPHPSnippetLanguage } from '@/registerPHPSnippetLanguage'
@@ -25,14 +20,6 @@ function runTinker() {
   })
 }
 
-function openDirectoryDialog(): void {
-  OpenDirectoryDialog().then((value: string) => {
-    if (value.trim() == '') return
-    data.projectDir = value
-    SetProjectDir(value)
-  })
-}
-
 function handleKeyboardShortcuts(e: KeyboardEvent): void {
   if (e.ctrlKey && e.code === 'KeyR') {
     runTinker()
@@ -40,7 +27,6 @@ function handleKeyboardShortcuts(e: KeyboardEvent): void {
 }
 
 onMounted(() => {
-  GetProjectDir().then((dir) => data.projectDir = dir)
   GetLastCode().then((code) => data.input = code)
 })
 
@@ -51,7 +37,7 @@ const handleMonacoBeforeMount = function (monaco) {
 
 <template>
   <main class="content-wrapper" @keypress="handleKeyboardShortcuts">
-    <div>Tinker ({{ data.projectDir }})</div>
+    <div>Tinker</div>
 
     <div class="input-wrapper">
       <splitpanes class="default-theme">
@@ -73,9 +59,6 @@ const handleMonacoBeforeMount = function (monaco) {
     </div>
 
     <div class="controls">
-      <label>Project dir:
-        <w-button class="ma1" color="primary" @click="openDirectoryDialog" outline md>Select</w-button>
-      </label>
       <w-button xl class="ma1" bg-color="primary" color="white" @click="runTinker">Execute</w-button>
     </div>
   </main>

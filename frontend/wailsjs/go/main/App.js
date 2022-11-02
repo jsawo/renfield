@@ -6,6 +6,26 @@ export function CopyToClipboard(arg1) {
   return window['go']['main']['App']['CopyToClipboard'](arg1);
 }
 
+export function CreateProject() {
+  return window['go']['main']['App']['CreateProject']();
+}
+
+export function GetConfig() {
+  return window['go']['main']['App']['GetConfig']();
+}
+
 export function OpenDirectoryDialog() {
   return window['go']['main']['App']['OpenDirectoryDialog']();
+}
+
+export function RemoveProject(arg1) {
+  return window['go']['main']['App']['RemoveProject'](arg1);
+}
+
+export function SetCurrentProject(arg1) {
+  return window['go']['main']['App']['SetCurrentProject'](arg1);
+}
+
+export function UpdateProjectSettings(arg1, arg2) {
+  return window['go']['main']['App']['UpdateProjectSettings'](arg1, arg2);
 }

@@ -4,7 +4,3 @@
 export function ExecuteCommand(arg1:string):Promise<string>;
 
 export function GetLastCode():Promise<string>;
-
-export function GetProjectDir():Promise<string>;
-
-export function SetProjectDir(arg1:string):Promise<void>;

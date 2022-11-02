@@ -9,11 +9,3 @@ export function ExecuteCommand(arg1) {
 export function GetLastCode() {
   return window['go']['tinker']['Tinker']['GetLastCode']();
 }
-
-export function GetProjectDir() {
-  return window['go']['tinker']['Tinker']['GetProjectDir']();
-}
-
-export function SetProjectDir(arg1) {
-  return window['go']['tinker']['Tinker']['SetProjectDir'](arg1);
-}

@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"github.com/jsawo/renfield/config"
+	"github.com/jsawo/renfield/project"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.design/x/clipboard"
 )
 
 type App struct {
-	ctx context.Context
+	ctx    context.Context
+	config config.AppConfig
 }
 
 func NewApp() *App {
@@ -18,7 +20,9 @@ func NewApp() *App {
 		panic(err)
 	}
 
-	return &App{}
+	return &App{
+		config: config.GetConfig(),
+	}
 }
 
 func (a *App) OpenDirectoryDialog() string {
@@ -31,5 +35,51 @@ func (a *App) CopyToClipboard(data string) {
 }
 
 func (a *App) GetConfig() config.AppConfig {
-	return config.GetConfig()
+	return a.config
+}
+
+func (a *App) SetCurrentProject(projectId string) {
+	a.config.Currentproject = projectId
+	a.saveConfig()
+}
+
+func (a *App) RemoveProject(projectId string) {
+	projectCount := len(a.config.Projects)
+
+	if projectCount == 1 {
+		return
+	}
+
+	delete(a.config.Projects, projectId)
+
+	for k := range a.config.Projects {
+		a.config.Currentproject = k
+		break
+	}
+
+	a.saveConfig()
+}
+
+func (a *App) CreateProject() string {
+	id := project.GetNewId()
+	project := config.ProjectConfig{
+		Id:   id,
+		Name: "Unnamed",
+		Tag:  "local",
+	}
+	a.config.Projects[id] = project
+	a.config.Currentproject = id
+
+	a.saveConfig()
+	return id
+}
+
+func (a *App) UpdateProjectSettings(projectId string, settings config.ProjectConfig) {
+	a.config.Projects[projectId] = settings
+	a.saveConfig()
+}
+
+func (a *App) saveConfig() {
+	runtime.EventsEmit(a.ctx, "configUpdated", a.config)
+	config.Save(a.config)
 }

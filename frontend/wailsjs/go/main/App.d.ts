@@ -4,6 +4,14 @@ import {config} from '../models';
 
 export function CopyToClipboard(arg1:string):Promise<void>;
 
+export function CreateProject():Promise<string>;
+
 export function GetConfig():Promise<config.AppConfig>;
 
 export function OpenDirectoryDialog():Promise<string>;
+
+export function RemoveProject(arg1:string):Promise<void>;
+
+export function SetCurrentProject(arg1:string):Promise<void>;
+
+export function UpdateProjectSettings(arg1:string,arg2:config.ProjectConfig):Promise<void>;

@@ -7,7 +7,6 @@ import (
 	"os/exec"
 
 	"github.com/jsawo/renfield/config"
-	"github.com/spf13/viper"
 )
 
 type Tinker struct {
@@ -16,16 +15,6 @@ type Tinker struct {
 
 func NewTinker() *Tinker {
 	return &Tinker{}
-}
-
-// SetProjectDir saves a given project path
-func (t *Tinker) SetProjectDir(projectDir string) {
-	viper.Set("laravel.project", projectDir)
-	config.Save()
-}
-
-func (t *Tinker) GetProjectDir() string {
-	return viper.GetString("laravel.project")
 }
 
 func (t *Tinker) GetLastCode() string {
@@ -43,7 +32,8 @@ func (t *Tinker) ExecuteCommand(input string) string {
 		return ""
 	}
 
-	projectDir := viper.GetString("laravel.project")
+	currentProject := config.GetConfig().Currentproject
+	projectDir := config.GetConfig().Projects[currentProject].Path
 
 	if projectDir == "" {
 		return "Error - no project directory selected"

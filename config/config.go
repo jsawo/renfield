@@ -18,6 +18,7 @@ type AppConfig struct {
 type ProjectConfig struct {
 	Id     string
 	Name   string
+	Path   string
 	Tag    string
 	Type   string
 	Tinker TinkerConfig
@@ -32,9 +33,11 @@ type Tag struct {
 	Color string
 }
 
+var appConfig AppConfig
+
 const (
 	appDir      = "renfield"
-	configFile  = "config.json"
+	configFile  = "config"
 	tempFileExt = ".tmp"
 )
 
@@ -47,25 +50,35 @@ func Initialize() {
 
 	setDefaults()
 
-	err = viper.WriteConfigAs(path.Join(dirPath, configFile))
+	err = viper.SafeWriteConfig()
+	if err != nil {
+		fmt.Fprint(os.Stderr, "ERROR: Failed write to config file: \n", err.Error())
+	}
+}
+
+func Save(config AppConfig) {
+	appConfig = config
+	viper.Set("currentproject", appConfig.Currentproject)
+	viper.Set("projects", appConfig.Projects)
+	viper.Set("tags", appConfig.Tags)
+
+	err := viper.WriteConfig()
 	if err != nil {
 		fmt.Fprint(os.Stderr, "ERROR: Failed write to config file:", err.Error())
 	}
 }
 
-func Save() {
-	_ = viper.WriteConfig()
+func GetConfig() AppConfig {
+	return appConfig
 }
 
-func GetConfig() AppConfig {
-	var conf AppConfig
-
-	err := viper.Unmarshal(&conf)
+func GetFreshConfig() AppConfig {
+	err := viper.Unmarshal(&appConfig)
 	if err != nil {
-		fmt.Fprint(os.Stderr, "ERROR: unable to decode into struct:", err.Error())
+		panic(fmt.Errorf("ERROR: unable to decode into struct: %w", err))
 	}
 
-	return conf
+	return appConfig
 }
 
 func GetAppConfigDir() string {
@@ -78,8 +91,11 @@ func GetTempFilePath(tempName string) string {
 }
 
 func Load() {
-	viper.SetConfigName("config")
+	viper.SetConfigName(configFile)
+	viper.SetConfigType("json")
 	viper.AddConfigPath(GetAppConfigDir())
+
+	appConfig = AppConfig{}
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -91,4 +107,6 @@ func Load() {
 		fmt.Fprint(os.Stderr, "ERROR:", err.Error())
 		os.Exit(2)
 	}
+
+	appConfig = GetFreshConfig()
 }

@@ -3,17 +3,17 @@ import 'wave-ui/dist/wave-ui.css'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { reactive, ref, onMounted, computed } from 'vue'
+import { reactive, onMounted, computed } from 'vue'
 import { EventsOn } from '@wails/runtime'
+import { GetConfig } from '@wails/go/main/App'
 import JsonFormatter from '@/components/pages/JsonFormatter.vue'
 import Beam from '@/components/pages/Beam.vue'
 import Tinker from '@/components/pages/Tinker.vue'
-import { GetConfig } from '@wails/go/main/App'
+import ProjectSettings from '@/components/pages/ProjectSettings.vue'
 import '@mdi/font/css/materialdesignicons.min.css'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
-
 dayjs.locale('pl')
 dayjs.tz.setDefault("Europe/Warsaw")
 
@@ -24,37 +24,41 @@ const tabs = [
 ]
 
 const data = reactive({
+  currentSection: "app", // app / projectSettings
   tabs: tabs,
   value: tabs[0].title,
+  messages: [] as Array<BeamMessage>,
+  appConfig: {} as AppConfig,
+  showNotification: false,
 })
 
-const appConfig = ref({} as AppConfig)
-
-const messages = ref([] as Array<BeamMessage>)
-
 EventsOn("beamMessage", function (messageData: RawBeamMessage) {
-  messages.value.unshift({
+  data.messages.unshift({
     timestamp: dayjs().toDate().toLocaleTimeString(),
     payload: messageData.Payload
   })
 })
 
-function clearMessages() {
-  messages.value = [];
-}
+EventsOn("configUpdated", function (appConfig: AppConfig) {
+  console.log("EVENT: received configUpdated message - updating appConfig")
+  data.appConfig = appConfig
+})
+
+
+const clearMessages = () => data.messages = []
 
 const currentProject = computed<Project>(function () {
-  return appConfig.value.Projects
-    ? appConfig.value.Projects[appConfig.value.Currentproject]
+  return data.appConfig.Projects
+    ? data.appConfig.Projects[data.appConfig.Currentproject]
     : {}
 })
 
 const currentColor = computed<string>(function() {
-  return getTagColor(currentProject.value.Tag)
+  return getTagColor(currentProject.value?.Tag)
 })
 
-function getTagColor(tag: string): string {
-  const foundTag = appConfig.value.Tags?.find(function(tagConfig) {
+const getTagColor = (tag: string): string => {
+  const foundTag = data.appConfig.Tags?.find(function(tagConfig) {
     if (tag === tagConfig.Label) {
       return tagConfig.Color
     }
@@ -63,32 +67,51 @@ function getTagColor(tag: string): string {
   return foundTag ? foundTag.Color : "black"
 }
 
-onMounted(() => {
-  GetConfig().then((config) => appConfig.value = config)
-})
+const openProjectManager = () => {
+  data.currentSection = data.currentSection === 'projectSettings' ? 'app' : 'projectSettings'
+}
+
+const refreshAppConfig = () => {
+  GetConfig().then((config) => {
+    data.appConfig = config
+  })
+}
+
+onMounted(() => refreshAppConfig())
 </script>
 
 <template>
   <w-app style="height: 100%;">
+    <w-notification v-model="data.showNotification" :timeout="1000" success plain round shadow absolute>
+      Project saved.
+    </w-notification>
+
     <div class="main-stack">
       <w-toolbar shadow>
         <div class="app-title">Renfield <div class="triangle"></div></div>
-        <div class="project-name">
-          {{ currentProject.Name }}
-          <w-tag class="ml2 mr2" outline :color="currentColor">{{ currentProject.Tag }}</w-tag>
+        <div class="project-name" @click="openProjectManager">
+          {{ currentProject?.Name }}
+          <w-tag class="ml2 mr2" outline bg-color="white" :color="currentColor">{{ currentProject?.Tag }}</w-tag>
         </div>
         <div class="spacer"></div>
         <w-icon class="mr1" xl>mdi mdi-cog</w-icon>
       </w-toolbar>
 
-      <w-tabs :items="tabs" transition="none" style="flex-grow: 1;" card>
+      <w-tabs v-if="data.currentSection === 'app'" :items="tabs" transition="none" style="flex-grow: 1;" card>
         <template #item-content="{ item }">
           <div class="component-wrapper">
-            <Beam v-if="item.id === 'beam'" :messages="messages" class="component" @clear-beam-messages="clearMessages"/>
+            <Beam v-if="item.id === 'beam'" :messages="data.messages" class="component" @clear-beam-messages="clearMessages"/>
             <component v-else class="component" :is="item.content" />
           </div>
         </template>
       </w-tabs>
+      <div v-else-if="data.currentSection === 'projectSettings'" class="component-wrapper ml3 mr3 mt3 mb3">
+        <ProjectSettings
+          :app-config="data.appConfig"
+          :current-project="currentProject"
+          @close="data.currentSection = 'app'"
+          />
+      </div>
     </div>
   </w-app>
 </template>

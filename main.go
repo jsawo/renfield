@@ -23,7 +23,6 @@ var assets embed.FS
 
 func main() {
 	config.Load()
-
 	appService = NewApp()
 	tinkerService = tinker.NewTinker()
 	jsonFormatter = json.NewJSONFormatter()

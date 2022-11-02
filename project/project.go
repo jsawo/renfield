@@ -1,11 +1,9 @@
 package project
 
 import (
-	"strings"
-
-	"github.com/oklog/ulid/v2"
+	"github.com/google/uuid"
 )
 
 func GetNewId() string {
-	return strings.ToLower(ulid.Make().String())
+	return uuid.NewString()
 }

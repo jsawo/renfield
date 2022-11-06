@@ -2,6 +2,8 @@
 import { reactive } from 'vue'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
+import Dropdown from 'primevue/dropdown'
+import PTag from 'primevue/tag'
 import { useToast } from "primevue/usetoast"
 import {
   OpenDirectoryDialog,
@@ -20,17 +22,21 @@ const emit = defineEmits(['close'])
 const toast = useToast();
 
 const data = reactive({
-  showNotification: false
+  tags: props.appConfig.Tags,
+  selectedTag: null,
 })
 
 const form = reactive({
   name: '',
   path: '',
+  tag: '',
 })
 
 const setFormDefaults = () => {
   form.name = props.currentProject.Name
   form.path = props.currentProject.Path
+  form.tag = props.currentProject.Tag
+  data.selectedTag = props.appConfig.Tags.find((tag) => tag.Label === form.tag)
 }
 
 setFormDefaults()
@@ -49,13 +55,12 @@ const selectProjectDir = (id: string) => {
 const deleteProject = (id: string) => {
   RemoveProject(id).then(() => {
     setFormDefaults()
-    data.showNotification = true
     toast.add({ severity: 'success', detail: 'Project removed.', life: 3000 });
   })
 }
 
 const createProject = () => {
-  CreateProject().then(() => {})
+  CreateProject()
 }
 
 const saveSettings = () => {
@@ -63,20 +68,23 @@ const saveSettings = () => {
     ...props.currentProject,
     Path: form.path,
     Name: form.name,
+    Tag: form.tag,
   })
   emit('close')
+}
+
+const tagChanged = (event: {value: Tag}) => {
+  form.tag = event.value.Label
 }
 </script>
 
 <template>
   <main>
-    <div class="title2">
-      Project Manager
-    </div>
+    Project Manager
 
-    <div class="settings mt3">
+    <div class="flex mt-3">
       <div class="settings__projects">
-        <div class="settings__new-project">
+        <div class="text-right">
           <Button label="New" class="p-button-sm" icon="pi pi-plus" @click="createProject" />
         </div>
         <div v-for="project in appConfig.Projects"
@@ -85,6 +93,9 @@ const saveSettings = () => {
              :key="project.Id"
           >
           {{ project.Name }}
+          <PTag class="project-tag mx-2"
+            :style="{ backgroundColor: props.appConfig.Tags.find((tag) => tag.Label === project.Tag).Color }"
+            :value="project.Tag" />
         </div>
       </div>
 
@@ -100,6 +111,11 @@ const saveSettings = () => {
             <label for="project_path">Path</label>
           </span>
           <Button label="Select" class="p-button-sm p-button-outlined ml-5" icon="pi pi-plus" @click="() => selectProjectDir(currentProject?.Id)" />
+        </div>
+
+        <div class="mt-4">
+          <label for="tag_select" class="mr-2">Tag</label>
+          <Dropdown id="tag_select" @change="tagChanged" v-model="data.selectedTag" :options="data.tags" optionLabel="Label" placeholder="Select Tag" />
         </div>
 
         <div class="text-right mt-4 mb-2">
@@ -122,17 +138,10 @@ const saveSettings = () => {
 </template>
 
 <style scoped>
-.settings {
-  display: flex;
-}
 .settings__projects {
   flex-grow: 1;
   max-width: 15rem;
   overflow: hidden;
-}
-
-.settings__new-project {
-  text-align: right;
 }
 
 .settings__form {
@@ -142,17 +151,11 @@ const saveSettings = () => {
 }
 
 .project {
-  /* margin-bottom: .5rem; */
   padding: .7rem 1rem;
   cursor: pointer;
-  /* border: solid 1px red; */
 }
 
-.project.active {
-  background: #fff;
-}
-
-.project:hover {
+.project.active, .project:hover {
   background: #fff;
 }
 </style>

@@ -1,8 +1,9 @@
 import {createApp} from 'vue'
 import App from './App.vue'
-import WaveUI from 'wave-ui'
-import './style.css'
+import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice'
 
 const app = createApp(App)
-new WaveUI(app, {})
+app.use(PrimeVue)
+app.use(ToastService)
 app.mount('#app')

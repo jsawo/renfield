@@ -4,6 +4,8 @@ import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { PrettifyJSON, GetLastCode } from '@wails/go/json/JSONFormatter'
 import Editor from '@/components/Editor.vue'
+import Button from 'primevue/button'
+import Slider from 'primevue/slider'
 
 const data = reactive({
   input: "",
@@ -53,10 +55,12 @@ onMounted(() => {
 
     <div class="controls">
       <div class="input_indentation">
-        <w-input type="number" v-model="data.indent" outline min="0" max="8">Indentation</w-input>
+        <div class="flex flex-column">
+          <span class="pb-1">Indent&nbsp;{{ data.indent }}</span> <Slider v-model="data.indent" :min="0" :max="8" />
+        </div>
       </div>
 
-      <w-button xl class="ma1" bg-color="primary" color="white" @click="runFormatter">Format</w-button>
+      <Button label="Format" @click="runFormatter" />
     </div>
   </main>
 </template>
@@ -80,10 +84,6 @@ onMounted(() => {
 .input_indentation {
   width: 6em;
   display: inline-block;
+  padding: 0 1.5rem .5rem 0;
 }
 </style>
-
-
-Http::post("http://localhost:3333/beam", ["payload"=> json_encode($u)]);
-
-curl -X POST -d '{"payload": "that"}' http://localhost:3333/beam

@@ -2,11 +2,10 @@
 import { reactive, onMounted } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
-import { ExecuteCommand, GetLastCode
-} from '@wails/go/tinker/Tinker'
+import { ExecuteCommand, GetLastCode } from '@wails/go/tinker/Tinker'
 import Editor from '@/components/Editor.vue'
 import { registerPHPSnippetLanguage } from '@/registerPHPSnippetLanguage'
-
+import Button from 'primevue/button'
 
 const data = reactive({
   projectDir: "",
@@ -59,7 +58,7 @@ const handleMonacoBeforeMount = function (monaco) {
     </div>
 
     <div class="controls">
-      <w-button xl class="ma1" bg-color="primary" color="white" @click="runTinker">Execute</w-button>
+      <Button label="Execute" @click="runTinker" />
     </div>
   </main>
 </template>

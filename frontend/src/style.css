@@ -1,9 +1,5 @@
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
 :root {
-    --va-font-family: "Ubuntu";
-    --va-tab-font-weight: 400;
-    --va-tabs-container-height: 2.9325rem
+    --font-family: "Ubuntu";
 }
 
 html {
@@ -36,12 +32,21 @@ div.code-editor * {
     background: linear-gradient(90deg, #666, #aaa, #666);
 }
 
-.w-app .w-tabs,
-.w-app .w-tabs__content-wrap,
-.w-app .w-tabs__content {
+.p-tabview {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition-duration: 0ms !important;
 }
 
-.w-tabs__content {
-    overflow: scroll;
+.p-tabview .p-tabview-panels {
+    flex-grow: 1;
+}
+
+.p-tabview .p-tabview-panel {
+    height: 99%;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
 }

@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { reactive } from 'vue'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import { useToast } from "primevue/usetoast"
 import {
   OpenDirectoryDialog,
   SetCurrentProject,
@@ -14,6 +17,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['close'])
+const toast = useToast();
 
 const data = reactive({
   showNotification: false
@@ -46,6 +50,7 @@ const deleteProject = (id: string) => {
   RemoveProject(id).then(() => {
     setFormDefaults()
     data.showNotification = true
+    toast.add({ severity: 'success', detail: 'Project removed.', life: 3000 });
   })
 }
 
@@ -65,10 +70,6 @@ const saveSettings = () => {
 
 <template>
   <main>
-    <w-notification v-model="data.showNotification" :timeout="1000" success plain round shadow absolute>
-      Project removed.
-    </w-notification>
-
     <div class="title2">
       Project Manager
     </div>
@@ -76,10 +77,7 @@ const saveSettings = () => {
     <div class="settings mt3">
       <div class="settings__projects">
         <div class="settings__new-project">
-          <w-button class="ma1" bg-color="primary" lg @click="createProject">
-            New
-            <w-icon class="ml1">wi-plus</w-icon>
-          </w-button>
+          <Button label="New" class="p-button-sm" icon="pi pi-plus" @click="createProject" />
         </div>
         <div v-for="project in appConfig.Projects"
              class="project" :class="currentProject?.Id === project.Id ? 'active' : ''"
@@ -91,25 +89,32 @@ const saveSettings = () => {
       </div>
 
       <div class="settings__form">
-        <w-input class="mb4 mt4" label="Name" placeholder="Unnamed" v-model="form.name" />
+        <span class="p-float-label flex-grow-1 my-5">
+          <InputText id="project_path" class="w-full" type="text" placeholder="Unnamed" v-model="form.name" />
+          <label for="project_path">Name</label>
+        </span>
 
-        <div class="path-selector">
-          <w-input class="mb4" label="Path" placeholder="/path/to/project/" v-model="form.path" />
-          <w-button class="ml5" color="primary" @click="() => selectProjectDir(currentProject?.Id)" outline lg>Select</w-button>
+        <div class="flex">
+          <span class="p-float-label flex-grow-1">
+            <InputText id="project_path" class="w-full" type="text" placeholder="/path/to/project/" v-model="form.path" />
+            <label for="project_path">Path</label>
+          </span>
+          <Button label="Select" class="p-button-sm p-button-outlined ml-5" icon="pi pi-plus" @click="() => selectProjectDir(currentProject?.Id)" />
         </div>
 
-        <div style="text-align: right;">
-          <w-button v-if="Object.keys(appConfig.Projects).length > 1" class="ma1" bg-color="error" lg @click="() => deleteProject(currentProject.Id)">
-            <w-icon class="mr1">wi-cross</w-icon>
-            Delete
-          </w-button>
-          <w-button class="ma1" outline lg @click="$emit('close')">
-            Cancel
-          </w-button>
-          <w-button class="ma1" bg-color="primary" lg @click="saveSettings">
-            <w-icon class="mr1">wi-check</w-icon>
-            Save
-          </w-button>
+        <div class="text-right mt-4 mb-2">
+          <Button label="Delete" class="p-button-danger p-button-sm ml-5" icon="pi pi-minus-circle"
+            @click="() => deleteProject(currentProject.Id)"
+            v-if="Object.keys(appConfig.Projects).length > 1"
+          />
+
+          <Button label="Cancel" class="p-button-warning p-button-sm ml-2" icon="pi pi-times"
+            @click="$emit('close')"
+          />
+
+          <Button label="Save" class="p-button-primary p-button-sm ml-2" icon="pi pi-check"
+            @click="saveSettings"
+          />
         </div>
       </div>
     </div>
@@ -149,9 +154,5 @@ const saveSettings = () => {
 
 .project:hover {
   background: #fff;
-}
-
-.path-selector {
-  display: flex;
 }
 </style>

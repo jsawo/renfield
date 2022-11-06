@@ -13,9 +13,11 @@
     "@guolao/vue-monaco-editor": "^0.0.5",
     "@mdi/font": "^7.0.96",
     "dayjs": "^1.11.6",
+    "primeflex": "^3.2.1",
+    "primeicons": "^6.0.1",
+    "primevue": "^3.18.1",
     "splitpanes": "^3.1.1",
-    "vue": "^3.2.37",
-    "wave-ui": "^2.42.2"
+    "vue": "^3.2.37"
   },
   "devDependencies": {
     "@babel/types": "^7.18.10",

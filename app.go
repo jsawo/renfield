@@ -62,12 +62,13 @@ func (a *App) RemoveProject(projectId string) {
 
 func (a *App) CreateProject() string {
 	id := project.GetNewId()
-	project := config.ProjectConfig{
-		Id:   id,
-		Name: "Unnamed",
-		Tag:  "local",
+	newProject := config.ProjectConfig{
+		Id:      id,
+		Name:    "Unnamed",
+		Tag:     "local",
+		Command: config.DefaultCommand,
 	}
-	a.config.Projects[id] = project
+	a.config.Projects[id] = newProject
 	a.config.Currentproject = id
 
 	a.saveConfig()

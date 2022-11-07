@@ -32,10 +32,11 @@ func (t *Tinker) ExecuteCommand(input string) string {
 		return ""
 	}
 
-	currentProject := config.GetConfig().Currentproject
-	projectDir := config.GetConfig().Projects[currentProject].Path
+	appConfig := config.GetConfig()
+	currentProjectId := appConfig.Currentproject
+	currentProject := appConfig.Projects[currentProjectId]
 
-	if projectDir == "" {
+	if currentProject.Path == "" {
 		return "Error - no project directory selected"
 	}
 
@@ -46,9 +47,10 @@ func (t *Tinker) ExecuteCommand(input string) string {
 		os.Exit(1)
 	}
 
-	commandString := fmt.Sprintf("cat %q | sed -e 's/^<?php//' | php artisan tinker", tempFile)
+	commandString := fmt.Sprintf("cat %q | sed -e 's/^<?php//' | %s", tempFile, currentProject.Command)
+
 	cmd := exec.Command("sh", "-c", commandString)
-	cmd.Dir = projectDir
+	cmd.Dir = currentProject.Path
 
 	out, _ := cmd.CombinedOutput()
 	return string(out)

@@ -16,12 +16,12 @@ type AppConfig struct {
 }
 
 type ProjectConfig struct {
-	Id     string
-	Name   string
-	Path   string
-	Tag    string
-	Type   string
-	Tinker TinkerConfig
+	Id      string
+	Name    string
+	Path    string
+	Tag     string
+	Command string
+	Tinker  TinkerConfig
 }
 
 type TinkerConfig struct {

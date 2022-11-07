@@ -24,20 +24,32 @@ const toast = useToast();
 const data = reactive({
   tags: props.appConfig.Tags,
   selectedTag: null,
+  commandPresets: [
+    "php artisan tinker",
+    "docker-compose exec -T php php artisan tinker",
+  ]
 })
 
 const form = reactive({
   name: '',
   path: '',
   tag: '',
+  command: '',
 })
 
 const setFormDefaults = () => {
   form.name = props.currentProject.Name
   form.path = props.currentProject.Path
   form.tag = props.currentProject.Tag
+  form.command = props.currentProject.Command
   data.selectedTag = props.appConfig.Tags.find((tag) => tag.Label === form.tag)
 }
+
+Object.keys(props.appConfig.Projects).forEach((projectId) => {
+  data.commandPresets.push(props.appConfig.Projects[projectId].Command)
+})
+
+data.commandPresets = [...new Set(data.commandPresets)]
 
 setFormDefaults()
 
@@ -60,7 +72,7 @@ const deleteProject = (id: string) => {
 }
 
 const createProject = () => {
-  CreateProject()
+  CreateProject().then(() => setFormDefaults())
 }
 
 const saveSettings = () => {
@@ -69,12 +81,17 @@ const saveSettings = () => {
     Path: form.path,
     Name: form.name,
     Tag: form.tag,
+    Command: form.command,
   })
   emit('close')
 }
 
 const tagChanged = (event) => {
   form.tag = event.value.Label
+}
+
+const commandPresetSelected = (event) => {
+  form.command = event.value
 }
 </script>
 
@@ -110,10 +127,21 @@ const tagChanged = (event) => {
             <InputText id="project_path" class="w-full" type="text" placeholder="/path/to/project/" v-model="form.path" />
             <label for="project_path">Path</label>
           </span>
-          <Button label="Select" class="p-button-sm p-button-outlined ml-5" icon="pi pi-plus" @click="() => selectProjectDir(currentProject?.Id)" />
+          <Button label="Select" class="p-button-sm p-button-outlined ml-5" icon="pi pi-folder-open" @click="() => selectProjectDir(currentProject?.Id)" />
         </div>
 
-        <div class="mt-4">
+        <div class="flex mt-5">
+          <span class="p-float-label flex-grow-1">
+            <InputText id="project_command" class="w-full" type="text" v-model="form.command" />
+            <label for="project_command">Command</label>
+          </span>
+
+          <div class="ml-3">
+            <Dropdown id="tag_select" @change="commandPresetSelected" :options="data.commandPresets" placeholder="Preset" />
+          </div>
+        </div>
+
+        <div class="mt-3">
           <label for="tag_select" class="mr-2">Tag</label>
           <Dropdown id="tag_select" @change="tagChanged" v-model="data.selectedTag" :options="data.tags" optionLabel="Label" placeholder="Select Tag" />
         </div>

@@ -9,7 +9,7 @@ interface Project {
   Name: string,
   Path: string,
   Tag: string,
-  Type: string,
+  Command: string,
   Tinker: {
     Tabs: Array<Tab>,
   }

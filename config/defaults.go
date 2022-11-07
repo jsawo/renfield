@@ -5,17 +5,19 @@ import (
 	"github.com/spf13/viper"
 )
 
+const DefaultCommand = "php artisan tinker"
+
 func setDefaults() {
 	defaultProjectId := project.GetNewId()
-	project := "projects." + defaultProjectId
+	projectDef := "projects." + defaultProjectId
 
 	viper.Set("currentproject", defaultProjectId)
-	viper.Set(project+".id", defaultProjectId)
-	viper.Set(project+".type", "local")
-	viper.Set(project+".name", "Unnamed")
-	viper.Set(project+".path", "")
-	viper.Set(project+".tag", "local")
-	viper.Set(project+".tinker.tabs", []string{})
+	viper.Set(projectDef+".id", defaultProjectId)
+	viper.Set(projectDef+".command", DefaultCommand)
+	viper.Set(projectDef+".name", "Unnamed")
+	viper.Set(projectDef+".path", "")
+	viper.Set(projectDef+".tag", "local")
+	viper.Set(projectDef+".tinker.tabs", []string{})
 
 	viper.Set("tags", []Tag{
 		{Label: "local", Color: "green"},

@@ -73,7 +73,7 @@ const saveSettings = () => {
   emit('close')
 }
 
-const tagChanged = (event: {value: Tag}) => {
+const tagChanged = (event) => {
   form.tag = event.value.Label
 }
 </script>

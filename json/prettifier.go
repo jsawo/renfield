@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/jsawo/renfield/cache"
+	"github.com/jsawo/renfield/editor"
 	"os"
 
 	"github.com/jsawo/renfield/config"
@@ -25,31 +27,32 @@ func (j *JSONFormatter) PrettifyJSON(indent int, input string) string {
 		return ""
 	}
 
-	tempFile := config.GetTempFilePath("json")
-	err := os.WriteFile(tempFile, []byte(input), 0660)
-	if err != nil {
-		fmt.Printf("ERR: Error writing to temp file: %v \n", err)
-		os.Exit(1)
-	}
+	cache.SaveCacheFile(input, "json_i")
 
 	indentstring := fmt.Sprintf("%*s", indent, "")
 
 	var result bytes.Buffer
-	err = json.Indent(&result, []byte(input), "", indentstring)
+	err := json.Indent(&result, []byte(input), "", indentstring)
 	if err != nil {
 		runtime.LogError(j.Ctx, err.Error())
 		return err.Error()
 	}
 
+	cache.SaveCacheFile(result.String(), "json_o")
+
 	return result.String()
 }
 
-func (j *JSONFormatter) GetLastCode() string {
-	content, err := os.ReadFile(config.GetTempFilePath("json"))
+func (j *JSONFormatter) GetLastCode() editor.EditorContent {
+	contentIn, err := os.ReadFile(config.GetTempFilePath("json_i"))
 	if err != nil {
-		return "-no preset content found-"
+		contentIn = []byte("-no preset content found-")
 	}
 
-	return string(content)
+	contentOut, _ := os.ReadFile(config.GetTempFilePath("json_o"))
+
+	return editor.EditorContent{
+		Input:  string(contentIn),
+		Output: string(contentOut),
+	}
 }
-	

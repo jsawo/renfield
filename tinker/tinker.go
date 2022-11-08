@@ -3,10 +3,11 @@ package tinker
 import (
 	"context"
 	"fmt"
+	"github.com/jsawo/renfield/cache"
+	"github.com/jsawo/renfield/config"
+	"github.com/jsawo/renfield/editor"
 	"os"
 	"os/exec"
-
-	"github.com/jsawo/renfield/config"
 )
 
 type Tinker struct {
@@ -17,13 +18,18 @@ func NewTinker() *Tinker {
 	return &Tinker{}
 }
 
-func (t *Tinker) GetLastCode() string {
-	content, err := os.ReadFile(config.GetTempFilePath("tinker"))
+func (t *Tinker) GetLastCode() editor.EditorContent {
+	contentIn, err := os.ReadFile(config.GetTempFilePath("tinker_i"))
 	if err != nil {
-		return "User::factory()->make()"
+		contentIn = []byte("User::factory()->make()")
 	}
 
-	return string(content)
+	contentOut, _ := os.ReadFile(config.GetTempFilePath("tinker_o"))
+
+	return editor.EditorContent{
+		Input:  string(contentIn),
+		Output: string(contentOut),
+	}
 }
 
 // ExecuteCommand executes a tinker command and returns the result
@@ -32,20 +38,13 @@ func (t *Tinker) ExecuteCommand(input string) string {
 		return ""
 	}
 
-	appConfig := config.GetConfig()
-	currentProjectId := appConfig.Currentproject
-	currentProject := appConfig.Projects[currentProjectId]
+	currentProject := config.GetCurrentProject()
 
 	if currentProject.Path == "" {
 		return "Error - no project directory selected"
 	}
 
-	tempFile := config.GetTempFilePath("tinker")
-	err := os.WriteFile(tempFile, []byte(input), 0660)
-	if err != nil {
-		fmt.Printf("ERR: Error writing to temp file: %v \n", err)
-		os.Exit(1)
-	}
+	tempFile := cache.SaveCacheFile(input, "tinker_i")
 
 	commandString := fmt.Sprintf("cat %q | sed -e 's/^<?php//' | %s", tempFile, currentProject.Command)
 
@@ -53,5 +52,7 @@ func (t *Tinker) ExecuteCommand(input string) string {
 	cmd.Dir = currentProject.Path
 
 	out, _ := cmd.CombinedOutput()
+	cache.SaveCacheFile(string(out), "tinker_o")
+
 	return string(out)
 }

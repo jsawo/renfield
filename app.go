@@ -11,7 +11,7 @@ import (
 
 type App struct {
 	ctx    context.Context
-	config config.AppConfig
+	config config.Config
 }
 
 func NewApp() *App {
@@ -21,7 +21,7 @@ func NewApp() *App {
 	}
 
 	return &App{
-		config: config.GetConfig(),
+		config: config.AppConfig,
 	}
 }
 
@@ -34,7 +34,7 @@ func (a *App) CopyToClipboard(data string) {
 	clipboard.Write(clipboard.FmtText, []byte(data))
 }
 
-func (a *App) GetConfig() config.AppConfig {
+func (a *App) GetConfig() config.Config {
 	return a.config
 }
 

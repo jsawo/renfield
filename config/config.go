@@ -9,22 +9,27 @@ import (
 	"github.com/spf13/viper"
 )
 
-type AppConfig struct {
+type Config struct {
 	Currentproject string `mapstructure:"currentproject"`
 	Projects       map[string]ProjectConfig
 	Tags           []Tag
 }
 
 type ProjectConfig struct {
-	Id      string
-	Name    string
-	Path    string
-	Tag     string
-	Command string
-	Tinker  TinkerConfig
+	Id            string
+	Name          string
+	Path          string
+	Tag           string
+	Command       string
+	Tinker        TinkerConfig
+	JSONFormatter JSONFormatterConfig
 }
 
 type TinkerConfig struct {
+	Tabs []editor.Tab
+}
+
+type JSONFormatterConfig struct {
 	Tabs []editor.Tab
 }
 
@@ -33,10 +38,11 @@ type Tag struct {
 	Color string
 }
 
-var appConfig AppConfig
+var AppConfig Config
 
 const (
 	appDir      = "renfield"
+	projectsDir = "projects"
 	configFile  = "config"
 	tempFileExt = ".tmp"
 )
@@ -56,11 +62,11 @@ func Initialize() {
 	}
 }
 
-func Save(config AppConfig) {
-	appConfig = config
-	viper.Set("currentproject", appConfig.Currentproject)
-	viper.Set("projects", appConfig.Projects)
-	viper.Set("tags", appConfig.Tags)
+func Save(config Config) {
+	AppConfig = config
+	viper.Set("currentproject", AppConfig.Currentproject)
+	viper.Set("projects", AppConfig.Projects)
+	viper.Set("tags", AppConfig.Tags)
 
 	err := viper.WriteConfig()
 	if err != nil {
@@ -68,17 +74,13 @@ func Save(config AppConfig) {
 	}
 }
 
-func GetConfig() AppConfig {
-	return appConfig
-}
-
-func GetFreshConfig() AppConfig {
-	err := viper.Unmarshal(&appConfig)
+func GetFreshConfig() Config {
+	err := viper.Unmarshal(&AppConfig)
 	if err != nil {
 		panic(fmt.Errorf("ERROR: unable to decode into struct: %w", err))
 	}
 
-	return appConfig
+	return AppConfig
 }
 
 func GetAppConfigDir() string {
@@ -87,7 +89,7 @@ func GetAppConfigDir() string {
 }
 
 func GetTempFilePath(tempName string) string {
-	return path.Join(GetAppConfigDir(), tempName+tempFileExt)
+	return path.Join(GetAppConfigDir(), projectsDir, GetCurrentProject().Id, tempName+tempFileExt)
 }
 
 func Load() {
@@ -95,7 +97,7 @@ func Load() {
 	viper.SetConfigType("json")
 	viper.AddConfigPath(GetAppConfigDir())
 
-	appConfig = AppConfig{}
+	AppConfig = Config{}
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -108,5 +110,9 @@ func Load() {
 		os.Exit(2)
 	}
 
-	appConfig = GetFreshConfig()
+	AppConfig = GetFreshConfig()
+}
+
+func GetCurrentProject() ProjectConfig {
+	return AppConfig.Projects[AppConfig.Currentproject]
 }

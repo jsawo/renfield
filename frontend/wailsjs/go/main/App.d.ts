@@ -6,7 +6,7 @@ export function CopyToClipboard(arg1:string):Promise<void>;
 
 export function CreateProject():Promise<string>;
 
-export function GetConfig():Promise<config.AppConfig>;
+export function GetConfig():Promise<config.Config>;
 
 export function OpenDirectoryDialog():Promise<string>;
 

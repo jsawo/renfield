@@ -26,7 +26,10 @@ function handleKeyboardShortcuts(e: KeyboardEvent): void {
 }
 
 onMounted(() => {
-  GetLastCode().then((code) => data.input = code)
+  GetLastCode().then((editorContent) => {
+    data.input = editorContent.Input
+    data.output = editorContent.Output
+  })
 })
 
 const handleMonacoBeforeMount = function (monaco) {

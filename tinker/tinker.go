@@ -3,11 +3,12 @@ package tinker
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
+
 	"github.com/jsawo/renfield/cache"
 	"github.com/jsawo/renfield/config"
 	"github.com/jsawo/renfield/editor"
-	"os"
-	"os/exec"
 )
 
 type Tinker struct {
@@ -51,7 +52,12 @@ func (t *Tinker) ExecuteCommand(input string) string {
 	cmd := exec.Command("sh", "-c", commandString)
 	cmd.Dir = currentProject.Path
 
-	out, _ := cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
+
+	if len(out) == 0 {
+		return err.Error()
+	}
+
 	cache.SaveCacheFile(string(out), "tinker_o")
 
 	return string(out)

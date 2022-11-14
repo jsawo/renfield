@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, computed } from 'vue'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Dropdown from 'primevue/dropdown'
@@ -53,6 +53,22 @@ data.commandPresets = [...new Set(data.commandPresets)]
 
 setFormDefaults()
 
+const sortedProjects = computed(function () {
+  const keys = Object.keys(props.appConfig.Projects).sort((a, b) => {
+    return props.appConfig.Projects[a].Name.localeCompare(props.appConfig.Projects[b].Name)
+  })
+
+  const sorted: Record<string, Project> = {}
+
+  keys.forEach(key => {
+    sorted[key] = props.appConfig.Projects[key]
+  })
+
+  return sorted
+})
+
+console.log(props.appConfig.Projects)
+
 const setCurrentProject = (id: string) => {
   SetCurrentProject(id).then(() => setFormDefaults())
 }
@@ -104,7 +120,7 @@ const commandPresetSelected = (event) => {
         <div class="text-right">
           <Button label="New" class="p-button-sm" icon="pi pi-plus" @click="createProject" />
         </div>
-        <div v-for="project in appConfig.Projects"
+        <div v-for="project in sortedProjects"
              class="project" :class="currentProject?.Id === project.Id ? 'active' : ''"
              @click="() => setCurrentProject(project.Id)"
              :key="project.Id"

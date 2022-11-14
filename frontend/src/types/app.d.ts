@@ -1,6 +1,6 @@
 interface AppConfig {
   Currentproject: string,
-  Projects: Array<Project>,
+  Projects: Record<string, Project>,
   Tags: Array<Tag>,
 }
 

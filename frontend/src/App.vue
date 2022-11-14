@@ -57,7 +57,7 @@ const clearMessages = () => data.messages = []
 const currentProject = computed<Project>(function () {
   return data.appConfig.Projects
     ? data.appConfig.Projects[data.appConfig.Currentproject]
-    : {}
+    : {} as Project
 })
 
 const currentColor = computed<string>(function() {

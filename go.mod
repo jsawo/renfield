@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/spf13/viper v1.13.0
-	github.com/wailsapp/wails/v2 v2.1.0
+	github.com/spf13/viper v1.14.0
+	github.com/wailsapp/wails/v2 v2.2.0
 	golang.design/x/clipboard v0.6.3
 )
 
@@ -30,6 +30,7 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
+	github.com/samber/lo v1.33.0 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -39,12 +40,13 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20221031165847-c99f073a8326 // indirect
+	golang.org/x/crypto v0.2.0 // indirect
+	golang.org/x/exp v0.0.0-20221110155412-d0897a79cd37 // indirect
+	golang.org/x/exp/shiny v0.0.0-20221110155412-d0897a79cd37 // indirect
 	golang.org/x/image v0.1.0 // indirect
-	golang.org/x/mobile v0.0.0-20221020085226-b36e6246172e // indirect
-	golang.org/x/net v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/mobile v0.0.0-20221110043201-43a038452099 // indirect
+	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

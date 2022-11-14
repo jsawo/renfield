@@ -69,7 +69,7 @@ function getPayload(payload: string): string {
 <style scoped>
 main {
   display: flex;
-  height: auto;
+  height: 100%;
   flex-direction: column;
 }
 
@@ -100,7 +100,9 @@ main {
 
 .log_box {
   list-style: none;
-  padding: 0;
+  padding: 2px;
+  height: 100%;
+  overflow: scroll;
 }
 
 .log_box li:first-child .p-card {

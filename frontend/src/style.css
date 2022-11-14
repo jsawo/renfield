@@ -37,10 +37,12 @@ div.code-editor * {
     display: flex;
     flex-direction: column;
     transition-duration: 0ms !important;
+    overflow: hidden;
 }
 
 .p-tabview .p-tabview-panels {
     flex-grow: 1;
+    overflow: hidden;
 }
 
 .p-tabview .p-tabview-panel {

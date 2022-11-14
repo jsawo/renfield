@@ -101,13 +101,11 @@ func Load() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found, initialize
 			Initialize()
-			return
+		} else {
+			fmt.Fprint(os.Stderr, "ERROR:", err.Error())
+			os.Exit(2)
 		}
-
-		fmt.Fprint(os.Stderr, "ERROR:", err.Error())
-		os.Exit(2)
 	}
 
 	AppConfig = GetFreshConfig()

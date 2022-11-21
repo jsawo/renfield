@@ -1,19 +1,54 @@
-# README
+# Renfield
 
-## About
+Just as Renfield was a loyal companion to Dracula and did all his dark bidding, this project exists to help you with all your Laravel debugging needs.
 
-This is the official Wails Vue-TS template.
+More seriously, it's a couple of tools that I find handy when working with Laravel projects, put together as a desktop app. Created mostly as an excuse to play with [wails](https://wails.io).
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+While this project is still in pretty fluid state - stuff is being added, changed and moved around - the basic functionality is already there. 
 
-## Live Development
+<p align="center" style="clear: both;">
+<img src="https://user-images.githubusercontent.com/1294706/203146768-8ce2b128-c70d-405a-b975-dad1467c0e8c.png">
+</p>
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+## Tools
+
+- **Tinker** - an interface for Lararavel Tinker
+- **JSON Formatter** - an easy way to avoid pasting JSON on random sites on the internet
+- **Beam** - super simple remote debugging with HTTP calls - it's not xDebug, but it won't stop application flow like `dd()`
+
+## Roadmap
+
+- [x] Tinker
+- [x] JSON Formatter
+- [x] Remote debugger
+- [ ] Grepping JSON - to help with analyzing larger JSON payloads
+- [ ] Static analysis tools - show info on models / relations / routes
+- [ ] Log viewer
+- [ ] PHP arrays / JSON converter
+- [ ] code editor tabs
+- [ ] saved snippets / bookmarked code
+- [ ] dynamic message filtering
+ 
+## Development
+
+Requirements: 
+
+- go 1.18+
+- npm
+- `wails` command (https://wails.io/docs/gettingstarted/installation)
+
+To run in live development mode, run `wails dev` in the project directory. This will run the project with hot-reload. You might need to run `npm install` inside the `frontend` directory first.
 
 ## Building
 
-To build a redistributable, production mode package, use `wails build`.
+    wails build
+
+This will produce a binary in `build/bin/` directory.
+
+---
+
+<p align="center" style="clear: both;">
+<img src="https://user-images.githubusercontent.com/1294706/203141766-cd0de8eb-f324-42c9-9a74-e4c15ca2b2fc.png"> <br />
+Renfield in Dracula (1931)
+</p>
+

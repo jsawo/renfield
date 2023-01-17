@@ -2,7 +2,7 @@
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { reactive, onMounted, computed } from 'vue'
+import { reactive, onMounted, computed, ref } from 'vue'
 import { EventsOn } from '@wails/runtime'
 import { GetConfig } from '@wails/go/main/App'
 import JsonFormatter from '@/components/pages/JsonFormatter.vue'
@@ -11,8 +11,6 @@ import Tinker from '@/components/pages/Tinker.vue'
 import ProjectSettings from '@/components/pages/ProjectSettings.vue'
 import Toast from 'primevue/toast'
 import Toolbar from 'primevue/toolbar'
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
 import Tag from 'primevue/tag'
 import 'primevue/resources/themes/saga-blue/theme.css'
 import 'primevue/resources/primevue.min.css'
@@ -30,6 +28,8 @@ const tabs = [
   { id: "jsonformatter", title: 'JSON Formatter', content: JsonFormatter },
   { id: "beam", title: 'Beam', content: Beam },
 ]
+
+const activeTab = ref(tabs[0].id)
 
 const data = reactive({
   currentSection: "app", // app / projectSettings
@@ -105,14 +105,21 @@ onMounted(() => refreshAppConfig())
         </template>
       </Toolbar>
 
-      <TabView v-if="data.currentSection === 'app'">
-        <TabPanel v-for="tab in tabs" :header="tab.title" :key="tab.id">
-          <div class="component-wrapper h-full">
-            <Beam v-if="tab.id === 'beam'" :messages="data.messages" class="component" @clear-beam-messages="clearMessages" />
-            <component v-else class="component" :is="tab.content" />
-          </div>
-        </TabPanel>
-      </TabView>
+      <div class="flex pl-2 border-gray-300 bg-gray-100" style="border-bottom: solid 2px;">
+        <div v-for="tab in tabs"
+          :style="[activeTab == tab.id ? 'border-bottom: solid 2px' : '', 'position: relative; top: 2px;']"
+          :class="[activeTab == tab.id ? 'text-blue-500' : '', 'px-3 py-3 font-medium cursor-pointer']"
+          @click="activeTab = tab.id"
+        >
+          {{ tab.title }}
+        </div>
+      </div>
+      <div v-if="data.currentSection === 'app'" class="component-wrapper h-full p-4">
+        <Beam v-if="activeTab === 'beam'" :messages="data.messages" class="component" @clear-beam-messages="clearMessages" />
+        <Tinker v-else-if="activeTab === 'tinker'" class="component" />
+        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" class="component" />
+      </div>
+
       <div v-else-if="data.currentSection === 'projectSettings'" class="component-wrapper pb-5 h-full m-3">
         <ProjectSettings
           :app-config="data.appConfig"

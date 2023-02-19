@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -19,13 +20,17 @@ type beamRequest struct {
 }
 
 func handleBeam(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		runtime.LogErrorf(appCtx, "error reading request body: %s", err)
+	}
 
 	var requestData beamRequest
-	err := decoder.Decode(&requestData)
+	err = json.Unmarshal(body, &requestData)
 
 	if err != nil {
 		runtime.LogErrorf(appCtx, "error parsing json: %s", err)
+		requestData.Payload = string(body)
 	}
 
 	runtime.EventsEmit(appCtx, "beamMessage", requestData)

@@ -21,24 +21,24 @@ function doCopy(data) {
 }
 
 function copyLaravelString() {
-  const data = `\\Illuminate\\Support\\Facades\\Http::post("http://localhost:${port}/beam", ["payload"=> json_encode(["foo" => "bar"])]);`
+  const data = `\\Illuminate\\Support\\Facades\\Http::post("http://localhost:${port}/beam", ["payload"=> json_encode(["message" => "Hello World"])]);`
   doCopy(data)
 }
 
 function copyPHPString() {
   const data = `file_get_contents('http://localhost:${port}/beam', false, stream_context_create([
-                    'http' => ['method' => 'POST', 'header' => 'Content-Type: application/json',
-                        'content' => json_encode(['payload' => json_encode([
-                            'foo' => 'bar',
-                    ])]),
-                ]]));`
+        'http' => ['method' => 'POST', 'header' => 'Content-Type: application/json',
+            'content' => json_encode(['payload' => json_encode([
+                'message' => 'Hello World',
+        ])]),
+    ]]));`
   doCopy(data)
 }
 
 function copyGOString() {
   const data = `client := &http.Client{}
     req, _ := http.NewRequest("POST", "http://localhost:${port}/beam", bytes.NewBuffer([]byte(\`{
-        "Payload": "foo"
+	      "Payload": "{ \\"message\\": \\"Hello World\\"}"
     }\`)))
     res, _ := client.Do(req)
     defer res.Body.Close()
@@ -48,7 +48,7 @@ function copyGOString() {
 
 
 function copyCurlString() {
-  const data = `curl -X POST -d '{"payload": "{ \\\"foo\\\": \\\"bar\\\" }"}' http://localhost:${port}/beam`
+  const data = `curl -X POST -d '{"payload": "{ \\\"message\\\": \\\"Hello World\\\" }"}' http://localhost:${port}/beam`
   doCopy(data)
 }
 

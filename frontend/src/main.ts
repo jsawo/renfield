@@ -1,9 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import PrimeVue from 'primevue/config'
-import ToastService from 'primevue/toastservice'
+import Notifications from 'notiwind'
 
 const app = createApp(App)
-app.use(PrimeVue)
-app.use(ToastService)
+app.use(Notifications)
 app.mount('#app')

@@ -12,12 +12,13 @@ withDefaults(defineProps<{
 
 <template>
   <Editor
+      height="100%"
       :value="value"
       theme='vs-dark'
       :defaultLanguage="language"
       :options="{
         lineNumbers: 'off',
-        wordWrap: 'on',
+        wordWrap: 'off',
         minimap: {
           enabled: false,
         },

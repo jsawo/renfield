@@ -13,16 +13,17 @@
     "@guolao/vue-monaco-editor": "^0.0.5",
     "@mdi/font": "^7.0.96",
     "dayjs": "^1.11.6",
-    "primeflex": "^3.2.1",
-    "primeicons": "^6.0.1",
-    "primevue": "^3.18.1",
+    "notiwind": "^2.0.0",
     "splitpanes": "^3.1.1",
     "vue": "^3.2.37"
   },
   "devDependencies": {
-    "@types/node": "^18.11.18",
     "@babel/types": "^7.18.10",
+    "@types/node": "^18.11.18",
     "@vitejs/plugin-vue": "^3.0.3",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.4",
     "typescript": "^4.6.4",
     "vite": "^3.0.7",
     "vue-tsc": "^0.39.5"

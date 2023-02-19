@@ -4,8 +4,8 @@ import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { ExecuteCommand, GetLastCode } from '@wails/go/tinker/Tinker'
 import Editor from '@/components/Editor.vue'
+import Button from '@/components/Button.vue'
 import { registerPHPSnippetLanguage } from '@/registerPHPSnippetLanguage'
-import Button from 'primevue/button'
 
 const data = reactive({
   projectDir: "",
@@ -38,10 +38,8 @@ const handleMonacoBeforeMount = function (monaco) {
 </script>
 
 <template>
-  <main class="content-wrapper" @keypress="handleKeyboardShortcuts">
-    <div>Tinker</div>
-
-    <div class="input-wrapper">
+  <main class="h-full flex flex-col gap-2" @keypress="handleKeyboardShortcuts">
+    <div class="input-wrapper h-[90%]">
       <splitpanes class="default-theme">
         <pane>
           <Editor class="code-editor text-box"
@@ -60,27 +58,8 @@ const handleMonacoBeforeMount = function (monaco) {
       </splitpanes>
     </div>
 
-    <div class="controls">
-      <Button label="Execute" @click="runTinker" />
+    <div class="text-center">
+      <Button @click="runTinker">Execute</Button>
     </div>
   </main>
 </template>
-
-<style scoped>
-.content-wrapper {
-  box-sizing: border-box;
-  display: flex;
-  gap: 1rem;
-  flex-direction: column;
-  height: 100%;
-}
-
-.input-wrapper {
-  flex-grow: 1;
-  height: 50%;
-}
-
-.controls {
-  text-align: center;
-}
-</style>

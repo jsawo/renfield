@@ -9,13 +9,10 @@ import JsonFormatter from '@/components/pages/JsonFormatter.vue'
 import Beam from '@/components/pages/Beam.vue'
 import Tinker from '@/components/pages/Tinker.vue'
 import ProjectSettings from '@/components/pages/ProjectSettings.vue'
-import Toast from 'primevue/toast'
-import Toolbar from 'primevue/toolbar'
-import Tag from 'primevue/tag'
-import 'primevue/resources/themes/saga-blue/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeflex/primeflex.css'
-import 'primeicons/primeicons.css'
+import AppHeader from '@/components/AppHeader.vue'
+import AppTab from '@/components/AppTab.vue'
+import AppTabBar from '@/components/AppTabBar.vue'
+import NotificationContainer from '@/components/NotificationContainer.vue'
 import './style.css'
 
 dayjs.extend(utc)
@@ -31,8 +28,13 @@ const tabs = [
 
 const activeTab = ref(tabs[0].id)
 
+const enum Section {
+  App = 'app',
+  ProjectManager = 'project-manager',
+}
+
 const data = reactive({
-  currentSection: "app", // app / projectSettings
+  currentSection: Section.App,
   tabs: tabs,
   value: tabs[0].title,
   messages: [] as Array<BeamMessage>,
@@ -60,11 +62,11 @@ const currentProject = computed<Project>(function () {
     : {} as Project
 })
 
-const currentColor = computed<string>(function() {
-  return getTagColor(currentProject.value?.Tag)
+const currentBadgeColor = computed<string>(function() {
+  return getBadgeColor(currentProject.value?.Tag)
 })
 
-const getTagColor = (tag: string): string => {
+const getBadgeColor = (tag: string): string => {
   const foundTag = data.appConfig.Tags?.find(function(tagConfig) {
     if (tag === tagConfig.Label) {
       return tagConfig.Color
@@ -75,7 +77,7 @@ const getTagColor = (tag: string): string => {
 }
 
 const openProjectManager = () => {
-  data.currentSection = data.currentSection === 'projectSettings' ? 'app' : 'projectSettings'
+  data.currentSection = data.currentSection === Section.ProjectManager ? Section.App : Section.ProjectManager
 }
 
 const refreshAppConfig = () => {
@@ -89,95 +91,41 @@ onMounted(() => refreshAppConfig())
 
 <template>
   <div class="h-full">
-    <Toast />
+    <NotificationContainer />
 
-    <div class="main-stack h-full flex flex-column">
-      <Toolbar class="toolbar">
-        <template #start>
-          <div class="app-title">Renfield <div class="triangle"></div></div>
-          <div class="project-name" @click="openProjectManager">
-            {{ currentProject?.Name }}
-            <Tag class="project-tag mx-2" :style="{backgroundColor: currentColor}" :value="currentProject?.Tag"></Tag>
-          </div>
-        </template>
-        <template #end>
-          <!-- <i class="pi pi-cog text-3xl"></i> -->
-        </template>
-      </Toolbar>
+    <div class="h-full w-full flex flex-col overflow-hidden">
+      <AppHeader 
+        :current-project="currentProject" 
+        :open-project-manager="openProjectManager" 
+        :badge-color="currentBadgeColor"
+        />
 
-      <div class="flex pl-2 border-gray-300 bg-gray-100" style="border-bottom: solid 2px;">
-        <div v-for="tab in tabs"
-          :style="[activeTab == tab.id ? 'border-bottom: solid 2px' : '', 'position: relative; top: 2px;']"
-          :class="[activeTab == tab.id ? 'text-blue-500' : '', 'px-3 py-3 font-medium cursor-pointer']"
+      <AppTabBar v-if="data.currentSection !== Section.ProjectManager">
+        <AppTab v-for="tab in tabs" 
+          :active="activeTab == tab.id" 
           @click="activeTab = tab.id"
         >
           {{ tab.title }}
-        </div>
-      </div>
-      <div v-if="data.currentSection === 'app'" class="component-wrapper h-full p-4">
-        <Beam v-if="activeTab === 'beam'" :messages="data.messages" class="component" @clear-beam-messages="clearMessages" />
-        <Tinker v-else-if="activeTab === 'tinker'" class="component" />
-        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" class="component" />
+        </AppTab>
+      </AppTabBar>
+
+      <div v-if="data.currentSection === Section.App" 
+        class="grow p-4 h-full"
+      >
+        <Beam v-if="activeTab === 'beam'" :messages="data.messages" @clear-beam-messages="clearMessages" />
+        <Tinker v-else-if="activeTab === 'tinker'" />
+        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" />
       </div>
 
-      <div v-else-if="data.currentSection === 'projectSettings'" class="component-wrapper pb-5 h-full m-3">
+      <div v-else-if="data.currentSection === Section.ProjectManager" 
+        class="pb-5 h-full m-3"
+      >
         <ProjectSettings
           :app-config="data.appConfig"
           :current-project="currentProject"
-          @close="data.currentSection = 'app'"
+          @close="data.currentSection = Section.App"
           />
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.toolbar {
-  padding: 0rem 1rem 0rem 0;
-  box-shadow: 0 0 3px 0 black;
-  z-index: 10;
-}
-
-.app-title {
-  font-size: 1.3rem;
-  background: rgb(37, 37, 37);
-  color: #eb5f5a;
-  padding: 1rem 1rem .6rem 1.5rem;
-  position: relative;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  cursor: default;
-}
-
-.app-title::after {
-  content: "";
-  position: absolute;
-  display: block;
-  right: -20px;
-  top: 0;
-  border-top: 50px solid rgb(37, 37, 37);
-  border-right: 20px solid transparent;
-  z-index: 100;
-}
-
-.project-name {
-  font-size: 1.3rem;
-  margin: -.5rem 1rem -.5rem 0rem;
-  padding: 1rem 1.5rem .6rem 2.5rem;
-  cursor: pointer;
-  position: relative;
-}
-
-.project-name:hover {
-  background: #eee;
-}
-
-.project-name .project-tag {
-  top: -3px;
-  position: relative;
-}
-</style>

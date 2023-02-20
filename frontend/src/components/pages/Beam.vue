@@ -1,14 +1,35 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { CopyToClipboard } from '@wails/go/main/App'
 import { notify } from "notiwind"
 import Button from '@/components/Button.vue'
 import Card from '@/components/Card.vue'
 
-defineProps<{
+const port = '3333'
+
+const props = defineProps<{
   messages: Array<BeamMessage>,
 }>()
 
-const port = '3333'
+const messagesToShow = computed(() => {
+  return props.messages.map((msg) => {
+    msg.colorGroup = getGroupColor(msg.group)
+    return msg
+  })
+})
+
+function getGroupColor(group: string): string | null {
+  var s = new Option().style
+  s.color = group
+
+  if (s.color === group || s.color.startsWith('rgb')) {
+    return s.color
+  }
+
+  console.log([s.color, group])
+
+  return null
+}
 
 function doCopy(data) {
   CopyToClipboard(data)
@@ -75,16 +96,25 @@ function getPayload(payload: string): string {
       </div>
     </div>
 
-    <Card id="empty-state" v-if="messages.length === 0">
+    <Card id="empty-state" v-if="messagesToShow.length === 0">
       <div>No messages received yet…</div>
     </Card>
 
     <ul class="log_box p-1 h-full overflow-y-scroll scroll-auto">
-      <li v-for="(msg, index) in messages" :key="index" 
+      <li v-for="(msg, index) in messagesToShow" :key="index" 
         class="first:mb-3 first:shadow-xl first:mx-0 mx-2 first:p-4 p-3 mb-3 bg-white shadow-sm"
       >
         <div class="flex">
-          <div class="w-24 shrink-0">{{ msg.timestamp }}</div>
+          <div class="w-24 shrink-0 text-slate-600 text-sm overflow-scroll">
+            <div>{{ msg.timestamp }}</div>
+            <div v-if="msg.group">
+              <div v-if="msg.colorGroup" 
+                class="w-14 h-4 mt-1 rounded-full border border-slate-600" 
+                :style="`background-color: ${msg.colorGroup};`">
+              </div>
+              <div v-else>{{ msg.group }}</div>
+            </div>
+          </div>
           <pre class="w-full">{{ getPayload(msg.payload) }}</pre>
         </div>
       </li>

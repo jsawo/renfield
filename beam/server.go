@@ -17,6 +17,7 @@ var (
 
 type beamRequest struct {
 	Payload string
+	Group   string
 }
 
 func handleBeam(w http.ResponseWriter, r *http.Request) {

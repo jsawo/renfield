@@ -45,7 +45,8 @@ const data = reactive({
 EventsOn("beamMessage", function (messageData: RawBeamMessage) {
   data.messages.unshift({
     timestamp: dayjs().toDate().toLocaleTimeString(),
-    payload: messageData.Payload
+    payload: messageData.Payload,
+    group: messageData.Group,
   })
 })
 

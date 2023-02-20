@@ -51,7 +51,6 @@ EventsOn("beamMessage", function (messageData: RawBeamMessage) {
 })
 
 EventsOn("configUpdated", function (appConfig: AppConfig) {
-  console.log("EVENT: received configUpdated message - updating appConfig")
   data.appConfig = appConfig
 })
 

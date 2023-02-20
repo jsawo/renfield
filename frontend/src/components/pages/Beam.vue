@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
+import chroma from 'chroma-js'
 import { CopyToClipboard } from '@wails/go/main/App'
 import { notify } from "notiwind"
 import Button from '@/components/Button.vue'
@@ -22,11 +23,9 @@ function getGroupColor(group: string): string | null {
   var s = new Option().style
   s.color = group
 
-  if (s.color === group || s.color.startsWith('rgb')) {
+  if (s.color !== '' && (s.color === group || s.color.startsWith('rgb'))) {
     return s.color
   }
-
-  console.log([s.color, group])
 
   return null
 }
@@ -67,7 +66,6 @@ function copyGOString() {
   doCopy(data)
 }
 
-
 function copyCurlString() {
   const data = `curl -X POST -d '{"payload": "{ \\\"message\\\": \\\"Hello World\\\" }"}' http://localhost:${port}/beam`
   doCopy(data)
@@ -106,13 +104,18 @@ function getPayload(payload: string): string {
       >
         <div class="flex">
           <div class="w-24 shrink-0 text-slate-600 text-sm overflow-scroll">
-            <div>{{ msg.timestamp }}</div>
+            <div class="pl-1">{{ msg.timestamp }}</div>
             <div v-if="msg.group">
               <div v-if="msg.colorGroup" 
-                class="w-14 h-4 mt-1 rounded-full border border-slate-600" 
-                :style="`background-color: ${msg.colorGroup};`">
+                class="w-20 h-4 px-2 text-xs text-center mt-1 rounded-full border overflow-hidden" 
+                :style="`background-color: ${msg.colorGroup}; 
+                         border-color: ${chroma(msg.colorGroup).darken().hex()};
+                         color: ${chroma(msg.colorGroup).luminance() > 0.4 ? '#000' : '#fff'};
+                        `"
+              >
+                <span>{{ msg.group }}</span>
               </div>
-              <div v-else>{{ msg.group }}</div>
+              <div v-else class="pl-1">{{ msg.group }}</div>
             </div>
           </div>
           <pre class="w-full">{{ getPayload(msg.payload) }}</pre>

@@ -81,7 +81,7 @@ function getPayload(payload: string): string {
 </script>
 
 <template>
-  <main class="flex flex-col m-0 gap-2 overflow-auto h-5/6">
+  <main class="flex flex-col m-0 gap-2 overflow-auto h-full p-4  pb-24">
     <div class="pt-1 pr-1">
       Beam (running on port :{{ port }})
       <Button @click="copyLaravelString" class="mr-2">Laravel</Button>

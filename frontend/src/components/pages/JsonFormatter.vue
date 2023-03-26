@@ -33,11 +33,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="h-full flex flex-col gap-2" @keypress="handleKeyboardShortcuts">
-    <div class="input-wrapper h-[90%]">
+  <main class="h-full pb-40" @keypress="handleKeyboardShortcuts">
+    <div class="input-wrapper | h-full">
       <splitpanes class="default-theme">
         <pane>
-          <Editor class="code-editor text-box"
+          <Editor class="code-editor"
             :value="data.input"
             :format-on-paste="false"
             language="json"
@@ -45,7 +45,7 @@ onMounted(() => {
           />
         </pane>
         <pane>
-          <Editor class="code-editor text-box"
+          <Editor class="code-editor"
             :value="data.output"
             language="json"
           />
@@ -53,7 +53,7 @@ onMounted(() => {
       </splitpanes>
     </div>
 
-    <div class="text-center">
+    <div class="text-center pt-2">
       <Button @click="runFormatter">Format</Button>
     </div>
   </main>

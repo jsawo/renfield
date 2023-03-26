@@ -90,7 +90,7 @@ onMounted(() => refreshAppConfig())
 </script>
 
 <template>
-  <div class="h-full">
+  <div class="h-full overflow-auto">
     <NotificationContainer />
 
     <div class="h-full w-full flex flex-col overflow-hidden">
@@ -110,7 +110,7 @@ onMounted(() => refreshAppConfig())
       </AppTabBar>
 
       <div v-if="data.currentSection === Section.App" 
-        class="grow p-4 h-full"
+        class="h-full"
       >
         <Beam v-if="activeTab === 'beam'" :messages="data.messages" @clear-beam-messages="clearMessages" />
         <Tinker v-else-if="activeTab === 'tinker'" />

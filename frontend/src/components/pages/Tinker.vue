@@ -38,8 +38,8 @@ const handleMonacoBeforeMount = function (monaco) {
 </script>
 
 <template>
-  <main class="h-full flex flex-col gap-2" @keypress="handleKeyboardShortcuts">
-    <div class="input-wrapper h-[90%]">
+  <main class="h-full pb-40" @keypress="handleKeyboardShortcuts">
+    <div class="input-wrapper | h-full">
       <splitpanes class="default-theme">
         <pane>
           <Editor class="code-editor text-box"
@@ -58,7 +58,7 @@ const handleMonacoBeforeMount = function (monaco) {
       </splitpanes>
     </div>
 
-    <div class="text-center">
+    <div class="text-center pt-2">
       <Button @click="runTinker">Execute</Button>
     </div>
   </main>

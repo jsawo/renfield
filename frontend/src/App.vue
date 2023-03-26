@@ -13,6 +13,7 @@ import AppHeader from '@/components/AppHeader.vue'
 import AppTab from '@/components/AppTab.vue'
 import AppTabBar from '@/components/AppTabBar.vue'
 import NotificationContainer from '@/components/NotificationContainer.vue'
+import LineWrapIcon from '@/components/icons/LineWrapIcon.vue'
 import './style.css'
 
 dayjs.extend(utc)
@@ -27,6 +28,8 @@ const tabs = [
 ]
 
 const activeTab = ref(tabs[0].id)
+
+const lineWrap = ref(false)
 
 const enum Section {
   App = 'app',
@@ -100,21 +103,30 @@ onMounted(() => refreshAppConfig())
         :badge-color="currentBadgeColor"
         />
 
-      <AppTabBar v-if="data.currentSection !== Section.ProjectManager">
-        <AppTab v-for="tab in tabs" 
-          :active="activeTab == tab.id" 
-          @click="activeTab = tab.id"
-        >
-          {{ tab.title }}
-        </AppTab>
-      </AppTabBar>
-
+      <div class="flex px-2 border-b-2 border-gray-300 bg-gray-200 justify-between">
+        <AppTabBar v-if="data.currentSection !== Section.ProjectManager">
+          <AppTab v-for="tab in tabs" 
+            :active="activeTab == tab.id" 
+            @click="activeTab = tab.id"
+          >
+            {{ tab.title }}
+          </AppTab>
+        </AppTabBar>
+        <div class="grid items-center">
+          <div class="text-gray-500 mr-2 select-none">
+            <label>
+              <input type="checkbox" class="hidden" v-model="lineWrap" />
+              <LineWrapIcon :class="['w-6 cursor-pointer', lineWrap ? 'text-black' : 'text-gray-400']" title="toggle line wrap" />
+            </label>
+          </div>
+        </div>
+      </div>
       <div v-if="data.currentSection === Section.App" 
         class="h-full"
       >
         <Beam v-if="activeTab === 'beam'" :messages="data.messages" @clear-beam-messages="clearMessages" />
-        <Tinker v-else-if="activeTab === 'tinker'" />
-        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" />
+        <Tinker v-else-if="activeTab === 'tinker'" :lineWrap="lineWrap" />
+        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" :lineWrap="lineWrap" />
       </div>
 
       <div v-else-if="data.currentSection === Section.ProjectManager" 

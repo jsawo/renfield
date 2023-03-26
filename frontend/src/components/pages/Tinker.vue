@@ -7,6 +7,12 @@ import Editor from '@/components/Editor.vue'
 import Button from '@/components/Button.vue'
 import { registerPHPSnippetLanguage } from '@/registerPHPSnippetLanguage'
 
+withDefaults(defineProps<{
+  lineWrap?: boolean,
+}>(), {
+  lineWrap: false,
+})
+
 const data = reactive({
   projectDir: "",
   input: "",
@@ -47,12 +53,14 @@ const handleMonacoBeforeMount = function (monaco) {
             language="php-snippet"
             @Change="(val, event) => data.input = val"
             :onBeforeMount="handleMonacoBeforeMount"
+            :wrap="lineWrap"
           />
         </pane>
         <pane>
           <Editor class="code-editor text-box"
             :value="data.output"
             language="php"
+            :wrap="lineWrap"
           />
         </pane>
       </splitpanes>

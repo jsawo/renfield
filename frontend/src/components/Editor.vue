@@ -5,8 +5,10 @@ withDefaults(defineProps<{
   value: string,
   language: string,
   formatOnPaste?: boolean,
+  wrap?: boolean,
 }>(), {
   formatOnPaste: true,
+  wrap: false,
 })
 </script>
 
@@ -18,7 +20,7 @@ withDefaults(defineProps<{
       :defaultLanguage="language"
       :options="{
         lineNumbers: 'off',
-        wordWrap: 'off',
+        wordWrap: wrap ? 'on' : 'off',
         minimap: {
           enabled: false,
         },

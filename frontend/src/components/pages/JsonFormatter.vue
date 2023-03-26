@@ -6,6 +6,12 @@ import { PrettifyJSON, GetLastCode } from '@wails/go/json/JSONFormatter'
 import Editor from '@/components/Editor.vue'
 import Button from '@/components/Button.vue'
 
+withDefaults(defineProps<{
+  lineWrap?: boolean,
+}>(), {
+  lineWrap: false,
+})
+
 const data = reactive({
   input: "",
   output: "",
@@ -42,12 +48,14 @@ onMounted(() => {
             :format-on-paste="false"
             language="json"
             @Change="(val, event) => data.input = val"
+            :wrap="lineWrap"
           />
         </pane>
         <pane>
           <Editor class="code-editor"
             :value="data.output"
             language="json"
+            :wrap="lineWrap"
           />
         </pane>
       </splitpanes>

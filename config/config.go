@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/jsawo/renfield/editor"
 	"github.com/spf13/viper"
 )
+
+var mtx = &sync.Mutex{}
 
 type Config struct {
 	Currentproject string `mapstructure:"currentproject"`
@@ -26,11 +29,13 @@ type ProjectConfig struct {
 }
 
 type TinkerConfig struct {
-	Tabs []editor.Tab
+	Tabs      []editor.Tab
+	ActiveTab string
 }
 
 type JSONFormatterConfig struct {
-	Tabs []editor.Tab
+	Tabs      []editor.Tab
+	ActiveTab string
 }
 
 type Tag struct {
@@ -60,6 +65,13 @@ func Initialize() {
 	if err != nil {
 		fmt.Fprint(os.Stderr, "ERROR: Failed write to config file: \n", err.Error())
 	}
+}
+
+func UpdateProject(project ProjectConfig) {
+	mtx.Lock()
+	AppConfig.Projects[project.Id] = project
+	Save(AppConfig)
+	mtx.Unlock()
 }
 
 func Save(config Config) {

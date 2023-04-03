@@ -6,6 +6,6 @@ export function ExecuteCommand(arg1) {
   return window['go']['tinker']['Tinker']['ExecuteCommand'](arg1);
 }
 
-export function GetLastCode() {
-  return window['go']['tinker']['Tinker']['GetLastCode']();
+export function GetLastCode(arg1) {
+  return window['go']['tinker']['Tinker']['GetLastCode'](arg1);
 }

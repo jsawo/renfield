@@ -1,20 +1,21 @@
 <script lang="ts" setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, watch } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { ExecuteCommand, GetLastCode } from '@wails/go/tinker/Tinker'
 import Editor from '@/components/Editor.vue'
 import Button from '@/components/Button.vue'
+import EditorTabBar from '@/components/EditorTabBar.vue'
 import { registerPHPSnippetLanguage } from '@/registerPHPSnippetLanguage'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   lineWrap?: boolean,
+  project?: Project,
 }>(), {
   lineWrap: false,
 })
 
 const data = reactive({
-  projectDir: "",
   input: "",
   output: "",
 })
@@ -31,12 +32,26 @@ function handleKeyboardShortcuts(e: KeyboardEvent): void {
   }
 }
 
+watch(() => props.project, (newValue, oldValue) => {
+  if(oldValue && oldValue.Tinker && newValue.Tinker.ActiveTab !== oldValue.Tinker.ActiveTab) {
+    refreshEditor()
+  }
+})
+
 onMounted(() => {
-  GetLastCode().then((editorContent) => {
+  refreshEditor()
+})
+
+function refreshEditor() {
+  let tabId = ""
+  if (props.project && props.project.Tinker) {
+    tabId = props.project.Tinker.ActiveTab
+  }
+  GetLastCode(tabId).then((editorContent) => {
     data.input = editorContent.Input
     data.output = editorContent.Output
   })
-})
+}
 
 const handleMonacoBeforeMount = function (monaco) {
   registerPHPSnippetLanguage(monaco.languages)
@@ -44,7 +59,12 @@ const handleMonacoBeforeMount = function (monaco) {
 </script>
 
 <template>
-  <main class="h-full pb-40" @keypress="handleKeyboardShortcuts">
+  <main class="h-full pb-48" @keypress="handleKeyboardShortcuts">
+    <EditorTabBar 
+      :tabs="project.Tinker?.Tabs" 
+      :activeTab="project.Tinker?.ActiveTab"
+      module="tinker"
+    />
     <div class="input-wrapper | h-full">
       <splitpanes class="default-theme">
         <pane>

@@ -4,4 +4,4 @@ import {editor} from '../models';
 
 export function ExecuteCommand(arg1:string):Promise<string>;
 
-export function GetLastCode():Promise<editor.EditorContent>;
+export function GetLastCode(arg1:string):Promise<editor.EditorContent>;

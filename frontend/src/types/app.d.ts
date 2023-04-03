@@ -12,6 +12,7 @@ interface Project {
   Command: string,
   Tinker: {
     Tabs: Array<Tab>,
+    ActiveTab: string,
   }
 }
 

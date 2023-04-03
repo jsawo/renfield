@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/jsawo/renfield/config"
+	"github.com/jsawo/renfield/editor"
 	"github.com/jsawo/renfield/project"
+	"github.com/samber/lo"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.design/x/clipboard"
 )
@@ -73,6 +75,60 @@ func (a *App) CreateProject() string {
 
 	a.saveConfig()
 	return id
+}
+
+func (a *App) NewTab(module string) {
+	newTab := editor.Tab{
+		Id:   project.GetNewId(),
+		Name: "Untitled",
+	}
+
+	currentProject := config.GetCurrentProject()
+	currentProject.Tinker.Tabs = append(currentProject.Tinker.Tabs, newTab)
+	currentProject.Tinker.ActiveTab = newTab.Id
+
+	a.config.Projects[currentProject.Id] = currentProject
+	a.saveConfig()
+}
+
+func (a *App) CloseTab(module, tabId string) {
+	currentProject := config.GetCurrentProject()
+	if len(currentProject.Tinker.Tabs) == 1 {
+		return
+	}
+
+	currentProject.Tinker.Tabs = lo.Filter(currentProject.Tinker.Tabs, func(tab editor.Tab, index int) bool {
+		return tab.Id != tabId
+	})
+
+	if currentProject.Tinker.ActiveTab == tabId {
+		currentProject.Tinker.ActiveTab = currentProject.Tinker.Tabs[0].Id
+	}
+
+	config.UpdateProject(currentProject)
+	a.saveConfig()
+}
+
+func (a *App) SetActiveTab(module, tabId string) {
+	currentProject := config.GetCurrentProject()
+	currentProject.Tinker.ActiveTab = tabId
+
+	config.UpdateProject(currentProject)
+	a.saveConfig()
+}
+
+func (a *App) RenameTab(module, tabId, newName string) {
+	currentProject := config.GetCurrentProject()
+
+	currentProject.Tinker.Tabs = lo.Map(currentProject.Tinker.Tabs, func(tab editor.Tab, index int) editor.Tab {
+		if tab.Id == tabId {
+			tab.Name = newName
+		}
+		return tab
+	})
+
+	config.UpdateProject(currentProject)
+	a.saveConfig()
 }
 
 func (a *App) UpdateProjectSettings(projectId string, settings config.ProjectConfig) {

@@ -103,8 +103,8 @@ onMounted(() => refreshAppConfig())
         :badge-color="currentBadgeColor"
         />
 
-      <div class="flex px-2 border-b-2 border-gray-300 bg-gray-200 justify-between">
-        <AppTabBar v-if="data.currentSection !== Section.ProjectManager">
+      <div v-if="data.currentSection !== Section.ProjectManager" class="flex px-2 border-b-2 border-gray-300 bg-gray-200 justify-between">
+        <AppTabBar>
           <AppTab v-for="tab in tabs" 
             :active="activeTab == tab.id" 
             @click="activeTab = tab.id"
@@ -124,9 +124,9 @@ onMounted(() => refreshAppConfig())
       <div v-if="data.currentSection === Section.App" 
         class="h-full"
       >
-        <Beam v-if="activeTab === 'beam'" :messages="data.messages" @clear-beam-messages="clearMessages" />
-        <Tinker v-else-if="activeTab === 'tinker'" :lineWrap="lineWrap" />
-        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" :lineWrap="lineWrap" />
+        <Beam v-if="activeTab === 'beam'" :project="currentProject" :messages="data.messages" @clear-beam-messages="clearMessages" />
+        <Tinker v-else-if="activeTab === 'tinker'" :project="currentProject" :lineWrap="lineWrap" />
+        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" :project="currentProject" :lineWrap="lineWrap" />
       </div>
 
       <div v-else-if="data.currentSection === Section.ProjectManager" 

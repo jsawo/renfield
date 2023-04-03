@@ -19,13 +19,17 @@ func NewTinker() *Tinker {
 	return &Tinker{}
 }
 
-func (t *Tinker) GetLastCode() editor.EditorContent {
-	contentIn, err := os.ReadFile(config.GetTempFilePath("tinker_i"))
+func (t *Tinker) GetLastCode(tabId string) editor.EditorContent {
+	if tabId == "" {
+		tabId = config.GetCurrentProject().Tinker.ActiveTab
+	}
+
+	contentIn, err := os.ReadFile(config.GetTempFilePath("tinker/" + tabId + "/in"))
 	if err != nil {
 		contentIn = []byte("User::factory()->make()")
 	}
 
-	contentOut, _ := os.ReadFile(config.GetTempFilePath("tinker_o"))
+	contentOut, _ := os.ReadFile(config.GetTempFilePath("tinker/" + tabId + "/out"))
 
 	return editor.EditorContent{
 		Input:  string(contentIn),
@@ -40,12 +44,13 @@ func (t *Tinker) ExecuteCommand(input string) string {
 	}
 
 	currentProject := config.GetCurrentProject()
+	currentTab := currentProject.Tinker.ActiveTab
 
 	if currentProject.Path == "" {
 		return "Error - no project directory selected"
 	}
 
-	tempFile := cache.SaveCacheFile(input, "tinker_i")
+	tempFile := cache.SaveCacheFile(input, "tinker/"+currentTab+"/in")
 
 	commandString := fmt.Sprintf("cat %q | sed -e 's/^<?php//' | %s", tempFile, currentProject.Command)
 
@@ -58,7 +63,7 @@ func (t *Tinker) ExecuteCommand(input string) string {
 		return err.Error()
 	}
 
-	cache.SaveCacheFile(string(out), "tinker_o")
+	cache.SaveCacheFile(string(out), "tinker/"+currentTab+"/out")
 
 	return string(out)
 }

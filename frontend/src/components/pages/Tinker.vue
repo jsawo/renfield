@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, onMounted, watch } from 'vue'
+import { reactive, onMounted, watch, ref } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { ExecuteCommand, GetLastCode } from '@wails/go/tinker/Tinker'
@@ -20,9 +20,18 @@ const data = reactive({
   output: "",
 })
 
+const busy = ref(false)
+
 function runTinker() {
+  busy.value = true
   ExecuteCommand(data.input).then(result => {
+    busy.value = false
+    console.log('got result:', result)
     data.output = result
+  }).catch(error => {
+    busy.value = false
+    console.log('got error when executing tinker command:', error)
+    data.output = error
   })
 }
 
@@ -43,6 +52,7 @@ onMounted(() => {
 })
 
 function refreshEditor() {
+  busy.value = true
   let tabId = ""
   if (props.project && props.project.Tinker) {
     tabId = props.project.Tinker.ActiveTab
@@ -50,6 +60,7 @@ function refreshEditor() {
   GetLastCode(tabId).then((editorContent) => {
     data.input = editorContent.Input
     data.output = editorContent.Output
+    busy.value = false
   })
 }
 
@@ -64,6 +75,7 @@ const handleMonacoBeforeMount = function (monaco) {
       :tabs="project.Tinker?.Tabs" 
       :activeTab="project.Tinker?.ActiveTab"
       module="tinker"
+      :busy="busy"
     />
     <div class="input-wrapper | h-full">
       <splitpanes class="default-theme">

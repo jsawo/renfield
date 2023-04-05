@@ -2,13 +2,16 @@
 import { onMounted, onBeforeUnmount } from 'vue';
 import EditorTab from '@/components/EditorTab.vue'
 import { NewTab, CloseTab, SetActiveTab, RenameTab } from '@wails/go/main/App'
+import Spinner from '@/components/icons/Spinner.vue'
 
 const props = withDefaults(defineProps<{
   module: string,
   tabs?: Tab[],
   activeTab?: string,
+  busy?: boolean,
 }>(), {
   activeTab: "",
+  busy: false,
 })
 
 const emit = defineEmits<{
@@ -58,14 +61,19 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex bg-stone-800">
-    <EditorTab v-for="tab in tabs" 
-      :active="tab.Id === activeTab" 
-      @click.middle.prevent="() => closeTab(tab.Id)"
-      @click.left.prevent="() => switchTab(tab.Id)"
-      @@tabRenamed="(newName) => tabRenamed(tab.Id, newName)"
-    >
-      {{ tab.Name }}
-    </EditorTab>
-    <EditorTab :active="false" @click="newTab" >+</EditorTab>
+    <div class="grid place-items-center px-1 w-7">
+      <Spinner v-if="busy" class="animate-spin text-white" />
+    </div>
+    <div class="flex grow">
+      <EditorTab v-for="tab in tabs" 
+        :active="tab.Id === activeTab" 
+        @click.middle.prevent="() => closeTab(tab.Id)"
+        @click.left.prevent="() => switchTab(tab.Id)"
+        @@tabRenamed="(newName) => tabRenamed(tab.Id, newName)"
+      >
+        {{ tab.Name }}
+      </EditorTab>
+      <EditorTab :active="false" @click="newTab" >+</EditorTab>
+    </div>
   </div>
 </template>

@@ -7,6 +7,7 @@ import Editor from '@/components/Editor.vue'
 import Button from '@/components/Button.vue'
 import EditorTabBar from '@/components/EditorTabBar.vue'
 import { registerPHPSnippetLanguage } from '@/registerPHPSnippetLanguage'
+import Spinner from '@/components/icons/Spinner.vue'
 
 const props = withDefaults(defineProps<{
   lineWrap?: boolean,
@@ -88,7 +89,10 @@ const handleMonacoBeforeMount = function (monaco) {
             :wrap="lineWrap"
           />
         </pane>
-        <pane>
+        <pane class="relative">
+          <div v-if="busy" class="absolute z-40 bg-[#8882] w-full h-full grid place-items-center">
+            <Spinner class="animate-spin text-white w-16 h-16" />
+          </div>
           <Editor class="code-editor text-box"
             :value="data.output"
             language="php"

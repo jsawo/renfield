@@ -7,25 +7,25 @@ More seriously, it's a couple of tools that I find handy when working with Larav
 While this project is still in pretty fluid state - stuff is being added, changed and moved around - the basic functionality is already there. 
 
 <p align="center" style="clear: both;">
-<img src="https://user-images.githubusercontent.com/1294706/203146768-8ce2b128-c70d-405a-b975-dad1467c0e8c.png">
+<img src="./screen.png">
 </p>
 
 ## Tools
 
 - **Tinker** - an interface for Lararavel Tinker
-- **JSON Formatter** - an easy way to avoid pasting JSON on random sites on the internet
-- **Beam** - super simple remote debugging with HTTP calls - it's not xDebug, but it won't stop application flow like `dd()`
+- **JSON Tools** - an easy way to avoid pasting JSON on random sites on the internet - pretty format, convert from and to PHP arrays
+- **Beam** - super simple remote debugging with HTTP calls - it's not xDebug, but it won't stop application flow like `dd()` or spam UI like `dump()`
 
 ## Roadmap
 
 - [x] Tinker
 - [x] JSON Formatter
 - [x] Remote debugger
+- [v] PHP arrays / JSON converter
+- [v] code editor tabs
 - [ ] Grepping JSON - to help with analyzing larger JSON payloads
 - [ ] Static analysis tools - show info on models / relations / routes
 - [ ] Log viewer
-- [ ] PHP arrays / JSON converter
-- [ ] code editor tabs
 - [ ] saved snippets / bookmarked code
 - [ ] dynamic message filtering
  

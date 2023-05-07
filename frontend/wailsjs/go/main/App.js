@@ -34,6 +34,10 @@ export function RenameTab(arg1, arg2, arg3) {
   return window['go']['main']['App']['RenameTab'](arg1, arg2, arg3);
 }
 
+export function SetActiveJSONTool(arg1) {
+  return window['go']['main']['App']['SetActiveJSONTool'](arg1);
+}
+
 export function SetActiveTab(arg1, arg2) {
   return window['go']['main']['App']['SetActiveTab'](arg1, arg2);
 }

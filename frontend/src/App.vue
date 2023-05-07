@@ -5,7 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import { reactive, onMounted, computed, ref } from 'vue'
 import { EventsOn } from '@wails/runtime'
 import { GetConfig } from '@wails/go/main/App'
-import JsonFormatter from '@/components/pages/JsonFormatter.vue'
+import JsonTools from '@/components/pages/JsonTools.vue'
 import Beam from '@/components/pages/Beam.vue'
 import Tinker from '@/components/pages/Tinker.vue'
 import ProjectSettings from '@/components/pages/ProjectSettings.vue'
@@ -23,7 +23,7 @@ dayjs.tz.setDefault("Europe/Warsaw")
 
 const tabs = [
   { id: "tinker", title: 'Tinker', content: Tinker },
-  { id: "jsonformatter", title: 'JSON Formatter', content: JsonFormatter },
+  { id: "jsontools", title: 'JSON Tools', content: JsonTools },
   { id: "beam", title: 'Beam', content: Beam },
 ]
 
@@ -126,7 +126,7 @@ onMounted(() => refreshAppConfig())
       >
         <Beam v-if="activeTab === 'beam'" :project="currentProject" :messages="data.messages" @clear-beam-messages="clearMessages" />
         <Tinker v-else-if="activeTab === 'tinker'" :project="currentProject" :lineWrap="lineWrap" />
-        <JsonFormatter v-else-if="activeTab === 'jsonformatter'" :project="currentProject" :lineWrap="lineWrap" />
+        <JsonTools v-else-if="activeTab === 'jsontools'" :project="currentProject" :lineWrap="lineWrap" />
       </div>
 
       <div v-else-if="data.currentSection === Section.ProjectManager" 

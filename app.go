@@ -77,6 +77,14 @@ func (a *App) CreateProject() string {
 	return id
 }
 
+func (a *App) SetActiveJSONTool(toolName string) {
+	currentProject := config.GetCurrentProject()
+	currentProject.JSONTools.ActiveTool = toolName
+
+	a.config.Projects[currentProject.Id] = currentProject
+	a.saveConfig()
+}
+
 func (a *App) NewTab(module string) {
 	newTab := editor.Tab{
 		Id:   project.GetNewId(),

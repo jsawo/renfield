@@ -18,6 +18,8 @@ export function RemoveProject(arg1:string):Promise<void>;
 
 export function RenameTab(arg1:string,arg2:string,arg3:string):Promise<void>;
 
+export function SetActiveJSONTool(arg1:string):Promise<void>;
+
 export function SetActiveTab(arg1:string,arg2:string):Promise<void>;
 
 export function SetCurrentProject(arg1:string):Promise<void>;

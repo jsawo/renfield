@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	_ "embed"
 
 	"github.com/jsawo/renfield/beam"
 	"github.com/jsawo/renfield/config"
@@ -16,8 +17,11 @@ import (
 var (
 	appService    *App
 	tinkerService *tinker.Tinker
-	jsonFormatter *json.JSONFormatter
+	jsonTools     *json.JSONTools
 )
+
+//go:embed php-cgi-8.2.0-slim.wasm
+var phpWasmBytes []byte
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -29,7 +33,7 @@ func main() {
 	config.Load()
 	appService = NewApp()
 	tinkerService = tinker.NewTinker()
-	jsonFormatter = json.NewJSONFormatter()
+	jsonTools = json.NewJSONTools(phpWasmBytes, config.GetWASMCachePath())
 
 	err := wails.Run(&options.App{
 		Title:            "Renfield",
@@ -41,7 +45,7 @@ func main() {
 		Bind: []interface{}{
 			appService,
 			tinkerService,
-			jsonFormatter,
+			jsonTools,
 		},
 		Linux: &linux.Options{
 			Icon:                icon,
@@ -66,5 +70,5 @@ func appStartup(ctx context.Context) {
 func propagateContext(ctx context.Context) {
 	appService.ctx = ctx
 	tinkerService.Ctx = ctx
-	jsonFormatter.Ctx = ctx
+	jsonTools.Ctx = ctx
 }

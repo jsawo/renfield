@@ -13,6 +13,11 @@ interface Project {
   Tinker: {
     Tabs: Array<Tab>,
     ActiveTab: string,
+  },
+  JSONTools: {
+    Tabs: Array<Tab>,
+    ActiveTab: string,
+    ActiveTool: string,
   }
 }
 

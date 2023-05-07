@@ -6,6 +6,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/samber/lo v1.38.1
 	github.com/spf13/viper v1.15.0
+	github.com/tetratelabs/wazero v1.1.0
 	github.com/wailsapp/wails/v2 v2.4.1
 	golang.design/x/clipboard v0.7.0
 )

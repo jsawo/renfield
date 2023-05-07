@@ -19,13 +19,13 @@ type Config struct {
 }
 
 type ProjectConfig struct {
-	Id            string
-	Name          string
-	Path          string
-	Tag           string
-	Command       string
-	Tinker        TinkerConfig
-	JSONFormatter JSONFormatterConfig
+	Id        string
+	Name      string
+	Path      string
+	Tag       string
+	Command   string
+	Tinker    TinkerConfig
+	JSONTools JSONToolsConfig
 }
 
 type TinkerConfig struct {
@@ -33,9 +33,10 @@ type TinkerConfig struct {
 	ActiveTab string
 }
 
-type JSONFormatterConfig struct {
-	Tabs      []editor.Tab
-	ActiveTab string
+type JSONToolsConfig struct {
+	Tabs       []editor.Tab
+	ActiveTab  string
+	ActiveTool string
 }
 
 type Tag struct {
@@ -98,6 +99,10 @@ func GetFreshConfig() Config {
 func GetAppConfigDir() string {
 	userConfigDir, _ := os.UserConfigDir()
 	return path.Join(userConfigDir, appDir)
+}
+
+func GetWASMCachePath() string {
+	return path.Join(GetAppConfigDir(), "cache_wasm")
 }
 
 func GetTempFilePath(tempName string) string {

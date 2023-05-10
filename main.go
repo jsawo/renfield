@@ -20,8 +20,11 @@ var (
 	jsonTools     *json.JSONTools
 )
 
-//go:embed php-cgi-8.2.0-slim.wasm
+//go:embed wasm/php-cgi-8.2.0-slim.wasm
 var phpWasmBytes []byte
+
+//go:embed wasm/gron.wasm
+var gronWasmBytes []byte
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -33,7 +36,7 @@ func main() {
 	config.Load()
 	appService = NewApp()
 	tinkerService = tinker.NewTinker()
-	jsonTools = json.NewJSONTools(phpWasmBytes, config.GetWASMCachePath())
+	jsonTools = json.NewJSONTools(phpWasmBytes, gronWasmBytes, config.GetWASMCachePath())
 
 	err := wails.Run(&options.App{
 		Title:            "Renfield",

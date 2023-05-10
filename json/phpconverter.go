@@ -56,7 +56,6 @@ func (j *JSONTools) runPHPWasi(stdin, stdout, stderr *bytes.Buffer) (string, err
 	ctx := context.Background()
 
 	// configure compilation cache
-	// cache, err := wazero.NewCompilationCacheWithDir("./cache")
 	cache, err := wazero.NewCompilationCacheWithDir(j.WasmCachePath)
 	if err != nil {
 		return "", err

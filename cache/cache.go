@@ -2,9 +2,10 @@ package cache
 
 import (
 	"fmt"
-	"github.com/jsawo/renfield/config"
 	"os"
 	"path/filepath"
+
+	"github.com/jsawo/renfield/config"
 )
 
 func SaveCacheFile(input, filename string) string {
@@ -25,4 +26,13 @@ func SaveCacheFile(input, filename string) string {
 	}
 
 	return tempFile
+}
+
+func ReadCacheFile(filename string) (string, bool) {
+	content, err := os.ReadFile(config.GetTempFilePath(filename))
+	if err != nil {
+		return "", false
+	}
+
+	return string(content), true
 }

@@ -2,36 +2,36 @@ package json
 
 import (
 	"context"
-	"os"
 
+	"github.com/jsawo/renfield/cache"
 	"github.com/jsawo/renfield/editor"
-
-	"github.com/jsawo/renfield/config"
 )
 
 type JSONTools struct {
 	Ctx           context.Context
 	PHPWasmBytes  []byte
+	GronWasmBytes []byte
 	WasmCachePath string
 }
 
-func NewJSONTools(phpWasm []byte, wasmCachePath string) *JSONTools {
+func NewJSONTools(phpWasm, gronWasm []byte, wasmCachePath string) *JSONTools {
 	return &JSONTools{
 		PHPWasmBytes:  phpWasm,
+		GronWasmBytes: gronWasm,
 		WasmCachePath: wasmCachePath,
 	}
 }
 
 func (j *JSONTools) GetLastCode() editor.EditorContent {
-	contentIn, err := os.ReadFile(config.GetTempFilePath("json_i"))
-	if err != nil {
-		contentIn = []byte("-no preset content found-")
+	contentIn, ok := cache.ReadCacheFile("json_i")
+	if !ok {
+		contentIn = "-no preset content found-"
 	}
 
-	contentOut, _ := os.ReadFile(config.GetTempFilePath("json_o"))
+	contentOut, _ := cache.ReadCacheFile("json_o")
 
 	return editor.EditorContent{
-		Input:  string(contentIn),
-		Output: string(contentOut),
+		Input:  contentIn,
+		Output: contentOut,
 	}
 }

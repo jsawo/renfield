@@ -5,19 +5,14 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/jsawo/renfield/cache"
 	"github.com/jsawo/renfield/config"
 	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"github.com/tetratelabs/wazero/sys"
 )
 
 func (j *JSONTools) Filter(filter string) string {
-	fmt.Print("########## time start\n")
-	start := time.Now()
-
 	input, _ := cache.ReadCacheFile("json_i")
 
 	currentProject := config.GetCurrentProject()
@@ -28,20 +23,29 @@ func (j *JSONTools) Filter(filter string) string {
 		return j.prettifyJSON(2, input)
 	}
 
-	stdin := bytes.NewBufferString(input)
+	gronResult := j.filterJSON(input, filter)
 
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
+	cache.SaveCacheFile(gronResult, "json_o")
+
+	return gronResult
+}
+
+func (j *JSONTools) filterJSON(input, filter string) string {
+	if input == "" {
+		return ""
+	}
+
+	if j.gronModule == nil {
+		j.gronModule = j.compileModule(j.GronWasmBytes)
+	}
 
 	// gron
-	gronResult, err := j.runGronWasi(stdin, &stdout, &stderr, false)
+	gronResult, err := j.runGronWasi(input)
 	if err != nil {
 		return err.Error()
 	}
 
-	fmt.Printf("step gron took: %v\n", time.Since(start))
-
-	// simple grep
+	// grep
 	gronLines := strings.Split(gronResult, "\n")
 	var greppedLines []string
 	for _, line := range gronLines {
@@ -50,64 +54,34 @@ func (j *JSONTools) Filter(filter string) string {
 		}
 	}
 
-	if len(greppedLines) == 0 {
-		return "{}"
-	}
-
 	greppedResult := strings.Join(greppedLines, "\n")
 
-	fmt.Printf("step grep took: %v\n", time.Since(start))
-
 	// ungron
-	stdin = bytes.NewBufferString(greppedResult)
-	stdout.Reset()
-	stderr.Reset()
-	ungronResult, err := j.runGronWasi(stdin, &stdout, &stderr, true)
+	ungronResult, err := j.runGronWasi(greppedResult, "--ungron")
 	if err != nil {
 		return err.Error()
 	}
 
-	fmt.Printf("step ungr took: %v\n", time.Since(start))
-
-	cache.SaveCacheFile(ungronResult, "json_o")
-
 	return ungronResult
 }
 
-func (j *JSONTools) runGronWasi(stdin, stdout, stderr *bytes.Buffer, ungron bool) (string, error) {
+func (j *JSONTools) runGronWasi(input string, args ...string) (string, error) {
 	ctx := context.Background()
 
-	// configure compilation cache
-	cache, err := wazero.NewCompilationCacheWithDir(j.WasmCachePath)
-	if err != nil {
-		return "", err
-	}
-	defer cache.Close(ctx)
-	runtimeConfig := wazero.NewRuntimeConfig().WithCompilationCache(cache)
+	args = append([]string{"--"}, args...)
 
-	// Create a new WebAssembly Runtime.
-	r := wazero.NewRuntimeWithConfig(ctx, runtimeConfig)
-	defer r.Close(ctx) // close everything this Runtime created
+	stdin := bytes.NewBufferString(input)
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
 
 	config := wazero.NewModuleConfig().
 		WithStdin(stdin).
-		WithStdout(stdout).
-		WithStderr(stderr).
-		WithArgs("--").
+		WithStdout(&stdout).
+		WithStderr(&stderr).
+		WithArgs(args...).
 		WithName("gron.wasm")
 
-	if ungron {
-		config = config.WithArgs("--ungron")
-	}
-
-	wasi_snapshot_preview1.MustInstantiate(ctx, r)
-
-	module, err := r.CompileModule(ctx, j.GronWasmBytes)
-	if err != nil {
-		return "", err
-	}
-
-	if _, err = r.InstantiateModule(ctx, module, config); err != nil {
+	if _, err := (*j.wazeroRuntime).InstantiateModule(ctx, j.gronModule, config); err != nil {
 		if exitErr, ok := err.(*sys.ExitError); ok && exitErr.ExitCode() != 0 {
 			return "", fmt.Errorf("exit code %d", exitErr.ExitCode())
 		} else if !ok {

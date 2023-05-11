@@ -9,9 +9,7 @@ import (
 
 	"github.com/jsawo/renfield/cache"
 	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 	"github.com/tetratelabs/wazero/sys"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // JSONToPHP converts a json string to a php array
@@ -22,11 +20,7 @@ func (j *JSONTools) JSONToPHP(input string) string {
 
 	cache.SaveCacheFile(input, "json_i")
 
-	result, err := j.convertToPHP(input)
-	if err != nil {
-		runtime.LogError(j.Ctx, err.Error())
-		return err.Error()
-	}
+	result := j.convertToPHP(input)
 
 	cache.SaveCacheFile(result, "json_o")
 
@@ -41,57 +35,14 @@ func (j *JSONTools) PHPToJSON(input string) string {
 
 	cache.SaveCacheFile(input, "json_i")
 
-	result, err := j.convertToJSON(input)
-	if err != nil {
-		runtime.LogError(j.Ctx, err.Error())
-		return err.Error()
-	}
+	result := j.convertToJSON(input)
 
 	cache.SaveCacheFile(result, "json_o")
 
 	return result
 }
 
-func (j *JSONTools) runPHPWasi(stdin, stdout, stderr *bytes.Buffer) (string, error) {
-	ctx := context.Background()
-
-	// configure compilation cache
-	cache, err := wazero.NewCompilationCacheWithDir(j.WasmCachePath)
-	if err != nil {
-		return "", err
-	}
-	defer cache.Close(ctx)
-	runtimeConfig := wazero.NewRuntimeConfig().WithCompilationCache(cache)
-
-	// Create a new WebAssembly Runtime.
-	r := wazero.NewRuntimeWithConfig(ctx, runtimeConfig)
-	defer r.Close(ctx) // close everything this Runtime created
-
-	config := wazero.NewModuleConfig().
-		WithStdin(stdin).
-		WithStdout(stdout).
-		WithStderr(stderr).
-		WithName("php-cgi-8.2.0.wasm")
-
-	wasi_snapshot_preview1.MustInstantiate(ctx, r)
-
-	module, err := r.CompileModule(ctx, j.PHPWasmBytes)
-	if err != nil {
-		return "", err
-	}
-
-	if _, err = r.InstantiateModule(ctx, module, config); err != nil {
-		if exitErr, ok := err.(*sys.ExitError); ok && exitErr.ExitCode() != 0 {
-			return "", fmt.Errorf("exit code %d", exitErr.ExitCode())
-		} else if !ok {
-			return "", err
-		}
-	}
-
-	return stdout.String(), nil
-}
-
-func (j *JSONTools) convertToPHP(jsonInput string) (string, error) {
+func (j *JSONTools) convertToPHP(jsonInput string) string {
 	code := `<?php
 $json = <<<'IDENTIFIER'
 %s
@@ -123,33 +74,24 @@ IDENTIFIER;
 	var_export(printArray($arr, 0, '  '));
 	`
 
-	php := fmt.Sprintf(code, jsonInput)
-	stdin := bytes.NewBufferString(php)
+	phpInput := fmt.Sprintf(code, jsonInput)
 
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
+	if j.phpModule == nil {
+		j.phpModule = j.compileModule(j.PHPWasmBytes)
+	}
 
-	result, err := j.runPHPWasi(stdin, &stdout, &stderr)
+	result, err := j.runPHPWasi(phpInput)
 	if err != nil {
-		return "", err
+		return err.Error()
 	}
 
-	// remove headers
-	content := strings.Split(result, "\r\n\r\n")
-	if len(content) < 2 {
-		return "", fmt.Errorf("could not find headers in output: %s", content[0])
-	}
+	out := cleanUpPHPOutput(result)
 
-	// Remove surrounding single quotes
-	re := regexp.MustCompile(`^'|'$`)
-	out := re.ReplaceAllString(content[1], "")
-
-	return out, nil
+	return out
 }
 
-func (j *JSONTools) convertToJSON(phpInput string) (string, error) {
+func (j *JSONTools) convertToJSON(phpInput string) string {
 	code := `<?php
-	// $arrayInput = eval('@s');
 	$arrayInput = %s;
 		
 	$result = json_encode($arrayInput, JSON_PRETTY_PRINT);
@@ -157,25 +99,51 @@ func (j *JSONTools) convertToJSON(phpInput string) (string, error) {
 	`
 
 	php := fmt.Sprintf(code, phpInput)
-	stdin := bytes.NewBufferString(php)
 
+	result, err := j.runPHPWasi(php)
+	if err != nil {
+		return err.Error()
+	}
+
+	out := cleanUpPHPOutput(result)
+
+	return out
+}
+
+func (j *JSONTools) runPHPWasi(input string) (string, error) {
+	ctx := context.Background()
+
+	stdin := bytes.NewBufferString(input)
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	result, err := j.runPHPWasi(stdin, &stdout, &stderr)
-	if err != nil {
-		return "", err
+	config := wazero.NewModuleConfig().
+		WithStdin(stdin).
+		WithStdout(&stdout).
+		WithStderr(&stderr).
+		WithName("php-cgi-8.2.0.wasm")
+
+	if _, err := (*j.wazeroRuntime).InstantiateModule(ctx, j.phpModule, config); err != nil {
+		if exitErr, ok := err.(*sys.ExitError); ok && exitErr.ExitCode() != 0 {
+			return "", fmt.Errorf("exit code %d", exitErr.ExitCode())
+		} else if !ok {
+			return "", err
+		}
 	}
 
+	return stdout.String(), nil
+}
+
+func cleanUpPHPOutput(output string) string {
 	// remove headers
-	content := strings.Split(result, "\r\n\r\n")
+	content := strings.Split(output, "\r\n\r\n")
 	if len(content) < 2 {
-		return "", fmt.Errorf("could not find headers in output: %s", content[0])
+		return fmt.Sprintf("could not find headers in output: %s", content[0])
 	}
 
 	// Remove surrounding single quotes
 	re := regexp.MustCompile(`^'|'$`)
 	out := re.ReplaceAllString(content[1], "")
 
-	return out, nil
+	return out
 }

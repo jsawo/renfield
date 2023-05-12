@@ -18,6 +18,7 @@ interface Project {
     Tabs: Array<Tab>,
     ActiveTab: string,
     ActiveTool: string,
+    Filter: string,
   }
 }
 

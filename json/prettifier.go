@@ -18,6 +18,14 @@ func (j *JSONTools) PrettifyJSON(indent int, input string) string {
 
 	cache.SaveCacheFile(input, "json_i")
 
+	result := j.prettifyJSON(indent, input)
+
+	cache.SaveCacheFile(result, "json_o")
+
+	return result
+}
+
+func (j *JSONTools) prettifyJSON(indent int, input string) string {
 	indentstring := fmt.Sprintf("%*s", indent, "")
 
 	var result bytes.Buffer
@@ -26,8 +34,6 @@ func (j *JSONTools) PrettifyJSON(indent int, input string) string {
 		runtime.LogError(j.Ctx, err.Error())
 		return err.Error()
 	}
-
-	cache.SaveCacheFile(result.String(), "json_o")
 
 	return result.String()
 }

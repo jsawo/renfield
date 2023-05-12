@@ -37,6 +37,7 @@ type JSONToolsConfig struct {
 	Tabs       []editor.Tab
 	ActiveTab  string
 	ActiveTool string
+	Filter     string
 }
 
 type Tag struct {

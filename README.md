@@ -23,7 +23,7 @@ While this project is still in pretty fluid state - stuff is being added, change
 - [x] Remote debugger
 - [x] PHP arrays / JSON converter
 - [x] code editor tabs
-- [ ] Grepping JSON - to help with analyzing larger JSON payloads
+- [x] Grepping JSON - to help with analyzing larger JSON payloads
 - [ ] Static analysis tools - show info on models / relations / routes
 - [ ] Log viewer
 - [ ] saved snippets / bookmarked code

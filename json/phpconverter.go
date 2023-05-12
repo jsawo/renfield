@@ -120,8 +120,7 @@ func (j *JSONTools) runPHPWasi(input string) (string, error) {
 	config := wazero.NewModuleConfig().
 		WithStdin(stdin).
 		WithStdout(&stdout).
-		WithStderr(&stderr).
-		WithName("php-cgi-8.2.0.wasm")
+		WithStderr(&stderr)
 
 	if _, err := (*j.wazeroRuntime).InstantiateModule(ctx, j.phpModule, config); err != nil {
 		if exitErr, ok := err.(*sys.ExitError); ok && exitErr.ExitCode() != 0 {

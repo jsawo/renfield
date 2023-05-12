@@ -27,7 +27,8 @@ func NewJSONTools(phpWasm, gronWasm []byte, wasmCachePath string) *JSONTools {
 	}
 
 	runtime := wazero.NewRuntimeWithConfig(ctx,
-		wazero.NewRuntimeConfig().WithCompilationCache(cache),
+		wazero.NewRuntimeConfig().
+			WithCompilationCache(cache),
 	)
 
 	wasi_snapshot_preview1.MustInstantiate(ctx, runtime)

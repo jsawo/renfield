@@ -12,6 +12,7 @@ func setDefaults() {
 	projectDef := "projects." + defaultProjectId
 
 	viper.Set("currentproject", defaultProjectId)
+	viper.Set("tinkerTimeout", 2)
 	viper.Set(projectDef+".id", defaultProjectId)
 	viper.Set(projectDef+".command", DefaultCommand)
 	viper.Set(projectDef+".name", "Unnamed")

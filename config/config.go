@@ -16,6 +16,7 @@ type Config struct {
 	Currentproject string `mapstructure:"currentproject"`
 	Projects       map[string]ProjectConfig
 	Tags           []Tag
+	TinkerTimeout  int // in seconds
 }
 
 type ProjectConfig struct {

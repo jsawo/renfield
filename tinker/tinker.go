@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"syscall"
+	"time"
 
 	"github.com/jsawo/renfield/cache"
 	"github.com/jsawo/renfield/config"
@@ -12,11 +14,14 @@ import (
 )
 
 type Tinker struct {
-	Ctx context.Context
+	Ctx            context.Context
+	commandTimeout int
 }
 
-func NewTinker() *Tinker {
-	return &Tinker{}
+func NewTinker(timeout int) *Tinker {
+	return &Tinker{
+		commandTimeout: timeout,
+	}
 }
 
 func (t *Tinker) GetLastCode(tabId string) editor.EditorContent {
@@ -52,18 +57,32 @@ func (t *Tinker) ExecuteCommand(input string) string {
 
 	tempFile := cache.SaveCacheFile(input, "tinker/"+currentTab+"/in")
 
-	commandString := fmt.Sprintf("cat %q | sed -e 's/^<?php//' | %s", tempFile, currentProject.Command)
-
-	cmd := exec.Command("sh", "-c", commandString)
-	cmd.Dir = currentProject.Path
-
-	out, err := cmd.CombinedOutput()
-
-	if len(out) == 0 {
-		return err.Error()
-	}
+	out, _ := t.executeTinkerCommand(tempFile, currentProject)
 
 	cache.SaveCacheFile(string(out), "tinker/"+currentTab+"/out")
 
 	return string(out)
+}
+
+func (t *Tinker) executeTinkerCommand(tempFile string, project config.ProjectConfig) (string, error) {
+	timeout := time.Duration(t.commandTimeout) * time.Second
+	ctx, _ := context.WithTimeout(context.Background(), timeout)
+
+	commandString := fmt.Sprintf("cat %q | %s", tempFile, project.Command)
+
+	cmd := exec.CommandContext(ctx, "sh", "-c", commandString)
+	cmd.Dir = project.Path
+	cmd.WaitDelay = timeout
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // set pgid for child processes
+
+	out, err := cmd.CombinedOutput()
+	if ctx.Err() != nil {
+		_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	}
+
+	if len(out) == 0 {
+		return "", err
+	}
+
+	return string(out), nil
 }

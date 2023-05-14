@@ -35,7 +35,7 @@ var icon []byte
 func main() {
 	config.Load()
 	appService = NewApp()
-	tinkerService = tinker.NewTinker()
+	tinkerService = tinker.NewTinker(appService.config.TinkerTimeout)
 	jsonTools = json.NewJSONTools(phpWasmBytes, gronWasmBytes, config.GetWASMCachePath())
 
 	err := wails.Run(&options.App{

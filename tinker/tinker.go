@@ -59,9 +59,9 @@ func (t *Tinker) ExecuteCommand(input string) string {
 
 	out, _ := t.executeTinkerCommand(tempFile, currentProject)
 
-	cache.SaveCacheFile(string(out), "tinker/"+currentTab+"/out")
+	cache.SaveCacheFile(out, "tinker/"+currentTab+"/out")
 
-	return string(out)
+	return out
 }
 
 func (t *Tinker) executeTinkerCommand(tempFile string, project config.ProjectConfig) (string, error) {

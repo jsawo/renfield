@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"html"
 	"regexp"
 	"strings"
 
 	"github.com/jsawo/renfield/cache"
 	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/sys"
 )
 
 // JSONToPHP converts a json string to a php array
@@ -49,25 +49,30 @@ $json = <<<'IDENTIFIER'
 IDENTIFIER;
 		
 	function printArray(array $arr, int $indent = 0, string $indentStr = "\t"): string {
-			$outerPad = $indent;
-			$innerPad = $indent + 1;
-			$out = '[';
-			if (count($arr) == 0) {
-					$out .= ']';
-			} else {
-					$out .= PHP_EOL;
-					foreach ($arr as $k => $v) {
-							$padding = str_repeat($indentStr, $innerPad);
-							$pattern = '%%s%%s => %%s,';
-							if (is_array($v)) $v = printArray($v, $innerPad, $indentStr);
-							else if (is_string($v)) $pattern = '%%s%%s => "%%s",';
-
-							$out .= sprintf($pattern, $padding, is_int($k) ? $k : "\"$k\"", $v) . PHP_EOL;
-					}
-					$out .= str_repeat($indentStr, $outerPad) . ']';
+		$outerPad = $indent;
+		$innerPad = $indent + 1;
+		$out = '[';
+		if (count($arr) === 0) {
+				$out .= ']';
+		} else {
+			$out .= PHP_EOL;
+			foreach ($arr as $k => $v) {
+				$padding = str_repeat($indentStr, $innerPad);
+				$pattern = '%%s%%s => %%s,';
+				if (is_array($v)) {
+					$v = printArray($v, $innerPad, $indentStr);
+				} else if (is_string($v)) {
+					$pattern = '%%s%%s => "%%s",';
+				} else if (is_null($v)) {
+					$pattern = '%%s%%s => NULL,';
+				}
+		
+				$out .= sprintf($pattern, $padding, is_int($k) ? $k : "\"$k\"", $v) . PHP_EOL;
 			}
+			$out .= str_repeat($indentStr, $outerPad) . ']';
+		}
 
-			return $out;
+		return $out;
 	}
 
 	$arr = json_decode($json, true);
@@ -76,14 +81,7 @@ IDENTIFIER;
 
 	phpInput := fmt.Sprintf(code, jsonInput)
 
-	if j.phpModule == nil {
-		j.phpModule = j.compileModule(j.PHPWasmBytes)
-	}
-
-	result, err := j.runPHPWasi(phpInput)
-	if err != nil {
-		return err.Error()
-	}
+	result := j.runPHPWasi(phpInput)
 
 	out := cleanUpPHPOutput(result)
 
@@ -100,18 +98,19 @@ func (j *JSONTools) convertToJSON(phpInput string) string {
 
 	php := fmt.Sprintf(code, phpInput)
 
-	result, err := j.runPHPWasi(php)
-	if err != nil {
-		return err.Error()
-	}
+	result := j.runPHPWasi(php)
 
 	out := cleanUpPHPOutput(result)
 
 	return out
 }
 
-func (j *JSONTools) runPHPWasi(input string) (string, error) {
+func (j *JSONTools) runPHPWasi(input string) string {
 	ctx := context.Background()
+
+	if j.phpModule == nil {
+		j.phpModule = j.compileModule(j.PHPWasmBytes)
+	}
 
 	stdin := bytes.NewBufferString(input)
 	var stdout bytes.Buffer
@@ -122,22 +121,19 @@ func (j *JSONTools) runPHPWasi(input string) (string, error) {
 		WithStdout(&stdout).
 		WithStderr(&stderr)
 
-	if _, err := (*j.wazeroRuntime).InstantiateModule(ctx, j.phpModule, config); err != nil {
-		if exitErr, ok := err.(*sys.ExitError); ok && exitErr.ExitCode() != 0 {
-			return "", fmt.Errorf("exit code %d", exitErr.ExitCode())
-		} else if !ok {
-			return "", err
-		}
+	_, err := (*j.wazeroRuntime).InstantiateModule(ctx, j.phpModule, config)
+	if err != nil {
+		return cleanUpPHPErrorOutput(stdout.String())
 	}
 
-	return stdout.String(), nil
+	return stdout.String()
 }
 
 func cleanUpPHPOutput(output string) string {
 	// remove headers
 	content := strings.Split(output, "\r\n\r\n")
 	if len(content) < 2 {
-		return fmt.Sprintf("could not find headers in output: %s", content[0])
+		return content[0]
 	}
 
 	// Remove surrounding single quotes
@@ -145,4 +141,13 @@ func cleanUpPHPOutput(output string) string {
 	out := re.ReplaceAllString(content[1], "")
 
 	return out
+}
+
+func cleanUpPHPErrorOutput(output string) string {
+	// remove html tags
+	output = regexp.MustCompile("<[^>]*>").
+		ReplaceAllString(output, "")
+
+	// unescape strings
+	return html.UnescapeString(output)
 }

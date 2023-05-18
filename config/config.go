@@ -128,6 +128,10 @@ func Load() {
 	}
 
 	AppConfig = GetFreshConfig()
+
+	if AppConfig.TinkerTimeout == 0 {
+		AppConfig.TinkerTimeout = defaultTinkerTimeout
+	}
 }
 
 func GetCurrentProject() ProjectConfig {

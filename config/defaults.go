@@ -6,13 +6,14 @@ import (
 )
 
 const DefaultCommand = "php artisan tinker"
+const defaultTinkerTimeout = 4
 
 func setDefaults() {
 	defaultProjectId := project.GetNewId()
 	projectDef := "projects." + defaultProjectId
 
 	viper.Set("currentproject", defaultProjectId)
-	viper.Set("tinkerTimeout", 2)
+	viper.Set("tinkerTimeout", defaultTinkerTimeout)
 	viper.Set(projectDef+".id", defaultProjectId)
 	viper.Set(projectDef+".command", DefaultCommand)
 	viper.Set(projectDef+".name", "Unnamed")

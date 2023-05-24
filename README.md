@@ -33,7 +33,7 @@ While this project is still in pretty fluid state - stuff is being added, change
 
 Requirements: 
 
-- go 1.18+
+- go 1.20+
 - npm
 - `wails` command (https://wails.io/docs/gettingstarted/installation)
 

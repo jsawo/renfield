@@ -3,28 +3,22 @@ package main
 import (
 	"context"
 	"embed"
-	_ "embed"
 
 	"github.com/jsawo/renfield/beam"
 	"github.com/jsawo/renfield/config"
 	"github.com/jsawo/renfield/json"
 	"github.com/jsawo/renfield/tinker"
+	"github.com/jsawo/renfield/wasm"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/linux"
 )
 
 var (
-	appService    *App
-	tinkerService *tinker.Tinker
-	jsonTools     *json.JSONTools
+	appAPI       *App
+	tinkerAPI    *tinker.Tinker
+	jsonToolsAPI *json.JSONTools
 )
-
-//go:embed wasm/php-cgi-8.2.0-slim.wasm
-var phpWasmBytes []byte
-
-//go:embed wasm/gron.wasm
-var gronWasmBytes []byte
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -34,9 +28,10 @@ var icon []byte
 
 func main() {
 	config.Load()
-	appService = NewApp()
-	tinkerService = tinker.NewTinker(appService.config.TinkerTimeout)
-	jsonTools = json.NewJSONTools(phpWasmBytes, gronWasmBytes, config.GetWASMCachePath())
+	appAPI = NewApp()
+	wasm.InitializeService()
+	tinkerAPI = tinker.NewTinker()
+	jsonToolsAPI = json.NewJSONTools()
 
 	err := wails.Run(&options.App{
 		Title:            "Renfield",
@@ -45,10 +40,10 @@ func main() {
 		Assets:           assets,
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:        appStartup,
-		Bind: []interface{}{
-			appService,
-			tinkerService,
-			jsonTools,
+		Bind: []any{
+			appAPI,
+			tinkerAPI,
+			jsonToolsAPI,
 		},
 		Linux: &linux.Options{
 			Icon:                icon,
@@ -71,7 +66,7 @@ func appStartup(ctx context.Context) {
 }
 
 func propagateContext(ctx context.Context) {
-	appService.ctx = ctx
-	tinkerService.Ctx = ctx
-	jsonTools.Ctx = ctx
+	appAPI.ctx = ctx
+	tinkerAPI.Ctx = ctx
+	jsonToolsAPI.Ctx = ctx
 }

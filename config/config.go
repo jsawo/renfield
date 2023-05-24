@@ -55,6 +55,7 @@ const (
 	tempFileExt = ".tmp"
 )
 
+// Initialize creates the file and sets the default config values
 func Initialize() {
 	dirPath := GetAppConfigDir()
 	err := os.MkdirAll(dirPath, os.ModePerm)
@@ -70,6 +71,7 @@ func Initialize() {
 	}
 }
 
+// UpdateProject saves the project config to the config file
 func UpdateProject(project ProjectConfig) {
 	mtx.Lock()
 	AppConfig.Projects[project.Id] = project
@@ -77,6 +79,7 @@ func UpdateProject(project ProjectConfig) {
 	mtx.Unlock()
 }
 
+// Save saves the given config to the config file
 func Save(config Config) {
 	AppConfig = config
 	viper.Set("currentproject", AppConfig.Currentproject)
@@ -89,6 +92,7 @@ func Save(config Config) {
 	}
 }
 
+// GetFreshConfig returns the current config from the config file
 func GetFreshConfig() Config {
 	err := viper.Unmarshal(&AppConfig)
 	if err != nil {
